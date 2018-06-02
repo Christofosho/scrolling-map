@@ -3,7 +3,7 @@ var server = 1; // is connected to server
 var DEBUG = 1;
 
 if (server)
-  var socket = io.connect('http://' + document.domain + ':' + location.port);
+  var socket = io.connect('//' + document.domain + ':' + location.port);
 
 var user = 0;
 
