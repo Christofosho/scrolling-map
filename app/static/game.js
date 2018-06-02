@@ -32,6 +32,7 @@ function draw() {
   for (x=0; x < canvas.clientWidth; x += tb) {
     for (y=0; y < canvas.clientHeight; y += tb) {
       ctx.beginPath();
+      ctx.strokeStyle = "grey";
       ctx.fillStyle = colours[map[y/tb+cy][x/tb+cx]];
       ctx.fillRect(x, y, tb, tb);
       ctx.moveTo(x, y);
@@ -48,6 +49,8 @@ function draw() {
   // Fill the character tile (TEMP)
   ctx.fillStyle = colour;
   ctx.fillRect(4*tb, 4*tb, tb, tb);
+  ctx.strokeStyle = "white";
+  ctx.strokeText("(" + cx + ", " + cy + ")", 5, 15);
 }
 
 function drawOthers() {
