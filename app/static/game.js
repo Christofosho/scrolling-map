@@ -106,7 +106,6 @@ var stop_var;
   if (server) { // Server listeners
 
     socket.on('connect', function() {
-      socket.emit('map_data', JSON.stringify(user));
       if (DEBUG) console.log('Beginning listener..')
       listener(); // Begin movement listener
     });
