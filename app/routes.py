@@ -69,6 +69,7 @@ def connect():
 @socketio.on('disconnect')
 def disconnect():
   users.pop(request.sid)
+  socketio.emit('update_all', json.dumps(users))
 
 @socketio.on('json')
 def move(data):
