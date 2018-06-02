@@ -7,6 +7,7 @@ from app import app, socketio
 from app.maps import MAPS
 
 COMMANDS = (
+  32,
   37,
   38,
   39,
@@ -18,6 +19,15 @@ COMMANDS = (
 )
 
 users = {}
+defaultx = 7
+defaulty = 7
+
+current_map = dict(MAPS['default']) # Take a copy
+
+colours = {
+  0: "blue",
+  1: "green"
+}
 
 @app.route("/", methods=['GET'])
 def index():
@@ -27,26 +37,29 @@ def index():
 @socketio.on('connect')
 def connect():
   user = request.sid
+
   r = lambda: random.randint(0, 255)
   colour = '#%02X%02X%02X' % (r(),r(),r())
+  colours[user] = colour
+
   users[user] = {
     'mapId': 'default',
     'colour': colour,
-    'cx': 7,
-    'cy': 7
+    'cx': defaultx,
+    'cy': defaulty
   }
 
   data = [
     user,
-    [7, 7],
+    [defaultx, defaulty],
     colour,
-    MAPS['default'],
-    users
+    current_map,
+    colours
   ]
 
   print ("User " + user + " has connected.")
 
-  emit('map_data', json.dumps(data), room=request.sid)
+  emit('init_data', json.dumps(data), room=request.sid)
   socketio.emit('update_all', json.dumps(users))
 
 @socketio.on('disconnect')
@@ -66,29 +79,37 @@ def move(data):
   if direction not in COMMANDS:
     return
 
-  cx = curr_cx = user.get('cx')
-  cy = curr_cy = user.get('cy')
-  map_data = MAPS.get(user.get('mapId'))
-  curr_map = map_data['map']
-  sx = map_data['sx']
-  sy = map_data['sy']
-  ex = map_data['ex']
-  ey = map_data['ey']
-  noWalkTiles = map_data['noWalk']
+  if direction == 32: # Spacebar
+    cx = curr_cx = user.get('cx')
+    cy = curr_cy = user.get('cy')
+    current_map['map'][cy][cx] = data['user']
+    map_data = [current_map['map'], colours]
+    emit('map_data', json.dumps(map_data), room=request.sid)
 
-  cx, cy = checkDirection(direction, cx, cy, sx, sy, ex, ey)
+  else:
+    cx = curr_cx = user.get('cx')
+    cy = curr_cy = user.get('cy')
+    map_data = MAPS.get(user.get('mapId'))
+    curr_map = map_data['map']
+    sx = map_data['sx']
+    sy = map_data['sy']
+    ex = map_data['ex']
+    ey = map_data['ey']
+    noWalkTiles = map_data['noWalk']
 
-  if (curr_map[cy][cx] not in noWalkTiles
-      and (cx != curr_cx or cy != curr_cy)):
-    users[data['user']]['cx'] = cx
-    users[data['user']]['cy'] = cy
-    emit('movement_self', json.dumps({
-      'user': data['user'],
-      'cx': cx,
-      'cy': cy
-    }), room=request.sid)
+    cx, cy = checkDirection(direction, cx, cy, sx, sy, ex, ey)
 
-  socketio.emit('update_all', json.dumps(users))
+    if (curr_map[cy][cx] not in noWalkTiles
+        and (cx != curr_cx or cy != curr_cy)):
+      users[data['user']]['cx'] = cx
+      users[data['user']]['cy'] = cy
+      emit('movement_self', json.dumps({
+        'user': data['user'],
+        'cx': cx,
+        'cy': cy
+      }), room=request.sid)
+
+    socketio.emit('update_all', json.dumps(users))
 
 ### Helpers
 def checkDirection(direction, cx, cy, sx, sy, ex, ey):

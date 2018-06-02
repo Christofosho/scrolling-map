@@ -3,9 +3,9 @@
   margin: 0 auto;
 }
 
-#help {
+.help {
   width: 450px;
   margin: 0 auto;
   text-align: center;
-  font-family: fantasy;
+  font-family: arial;
 }

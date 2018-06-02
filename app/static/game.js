@@ -1,9 +1,5 @@
 /* INITIALIZING */
-var server = 1; // is connected to server
-var DEBUG = 0;
-
-if (server)
-  var socket = io.connect('//' + document.domain + ':' + location.port);
+var socket = io.connect('//' + document.domain + ':' + location.port);
 
 var user = 0;
 
@@ -24,8 +20,8 @@ var map = [];
 
 /* MAP OPTIONS */
 var colours = {
-  0:"blue",
-  1:"green"
+  0: "blue",
+  1: "green"
 };
 
 var all_users = {};
@@ -76,21 +72,16 @@ function drawOthers() {
 /* MOVEMENT */
 function sendAction(e) {
   if (![
-    37, 38, 39, 40, 65, 68, 83, 87
+    32, 37, 38, 39, 40, 65, 68, 83, 87
   ].includes(e.keyCode)) return;
   e.preventDefault();
 
   listener(); // Reset listener.
 
-  if (server) {
-    socket.emit('json', JSON.stringify({
-      'user': user,
-      'direction': e.keyCode,
-    }))
-  }
-  else {
-    doMove(e);
-  }
+  socket.emit('json', JSON.stringify({
+    'user': user,
+    'direction': e.keyCode,
+  }))
 }
 
 function doMove(movement) {
@@ -110,45 +101,47 @@ var stop_var;
     draw();
   }
 
-  if (server) { // Server listeners
+  socket.on('connect', function() {
+    listener(); // Begin movement listener
+  });
 
-    socket.on('connect', function() {
-      if (DEBUG) console.log('Beginning listener..')
-      listener(); // Begin movement listener
-    });
+  // Recieves and populates initial data.
+  socket.on('init_data', function (data) {
+    data = JSON.parse(data);
+    user = data[0];
+    cx = data[1][0];
+    cy = data[1][1];
+    colour = data[2];
+    map  = data[3]['map'];
+    tb = data[3]['tb'];
+    sx = data[3]['sx'];
+    sy = data[3]['sy'];
+    colours = data[4];
+    main(); // Start the cycle
+  });
 
-    // Recieves and populates map data.
-    socket.on('map_data', function (data) {
-      if (DEBUG) console.log('Got map data!');
-      data = JSON.parse(data);
-      user = data[0];
-      cx = data[1][0];
-      cy = data[1][1];
-      colour = data[2];
-      map  = data[3]['map'];
-      tb = data[3]['tb'];
-      sx = data[3]['sx'];
-      sy = data[3]['sy'];
-      if (DEBUG) console.log('Executing main..');
-      main(); // Start the cycle
-    });
+  // Recieves and populates map data.
+  socket.on('map_data', function (data) {
+    data = JSON.parse(data);
+    map  = data[0];
+    colours = data[1];
+    main(); // Start the cycle
+  });
 
-    // Moves the local player
-    socket.on('movement_self', function (data) {
-      data = JSON.parse(data);
-      if (user == data['user'])
-        if (DEBUG) console.log('Attempting move..');
-        doMove(data);
-    });
+  // Moves the local player
+  socket.on('movement_self', function (data) {
+    data = JSON.parse(data);
+    if (user == data['user'])
+      doMove(data);
+  });
 
-    // Updates all players
-    socket.on('update_all', function (data) {
-      data = JSON.parse(data);
-      all_users = data;
-    });
+  // Updates all players
+  socket.on('update_all', function (data) {
+    data = JSON.parse(data);
+    all_users = data;
+  });
 
-    socket.on('failure', function (data) {
-      console.log('Unsynchronized.');
-    });
-  }
+  socket.on('failure', function (data) {
+    console.log('Unsynchronized.');
+  });
 })();
