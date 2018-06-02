@@ -68,7 +68,7 @@ def connect():
 
 @socketio.on('disconnect')
 def disconnect():
-  users.pop(request.sid)
+  users.pop(request.sid, 0)
   socketio.emit('update_all', json.dumps(users))
 
 @socketio.on('json')
@@ -76,8 +76,8 @@ def move(data):
   data = json.loads(data)
 
   user = users.get(data['user'])
-  if not user:
-    return
+  if not user or (data['user'] != request.sid):
+    return disconnect()
 
   direction = data['direction']
   if direction not in COMMANDS:
