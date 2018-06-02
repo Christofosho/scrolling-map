@@ -9,8 +9,9 @@ var ctx = canvas.getContext('2d');
 var tb = 0; // Tile Buffer: How large tiles are
 
 // character start (0,0)
-var cx = 0;
-var cy = 0;
+var cx = old_cx = 0;
+var cy = old_cy = 0;
+
 var sx = 0;
 var sy = 0;
 
@@ -28,18 +29,22 @@ var all_users = {};
 
 /* DRAWING */
 function draw() {
-  for (x=0; x < canvas.clientWidth; x += tb) {
-    for (y=0; y < canvas.clientHeight; y += tb) {
-      ctx.beginPath();
-      ctx.strokeStyle = "grey";
-      ctx.fillStyle = colours[map[y/tb+(cy-sy)][x/tb+(cx-sx)]];
-      ctx.fillRect(x, y, tb, tb);
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + tb, y);
-      ctx.moveTo(x, y);
-      ctx.lineTo(x, y + tb);
-      ctx.stroke();
-      ctx.closePath();
+  if (!(old_cx == cx && old_cy == cy)) {
+    for (x=0; x < canvas.clientWidth; x += tb) {
+      var curr_x = x/tb+(cx-sx);
+      var tb_x = x + tb;
+      for (y=0; y < canvas.clientHeight; y += tb) {
+        ctx.beginPath();
+        ctx.strokeStyle = "grey";
+        ctx.fillStyle = colours[map[y/tb+(cy-sy)][curr_x]];
+        ctx.fillRect(x, y, tb, tb);
+        ctx.moveTo(x, y);
+        ctx.lineTo(tb_x, y);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y + tb);
+        ctx.stroke();
+        ctx.closePath();
+      }
     }
   }
 
@@ -85,6 +90,8 @@ function sendAction(e) {
 }
 
 function doMove(movement) {
+  old_cx = cx;
+  old_cy = cy;
   cx = movement['cx'];
   cy = movement['cy'];
 }
@@ -97,7 +104,7 @@ function listener() {
 var stop_var;
 (function () {
   function main( tFrame ) {
-    stop_var = window.requestAnimationFrame( main );
+    stop_var = requestAnimationFrame( main );
     draw();
   }
 
