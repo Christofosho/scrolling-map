@@ -1,4 +1,4 @@
-import json, uuid
+import json, uuid, random
 from flask import request, render_template
 from flask_socketio import send, emit
 
@@ -49,14 +49,18 @@ def index():
 @socketio.on('connect')
 def connect():
   user = request.sid
+  r = lambda: random.randint(0, 255)
+  colour = '#%02X%02X%02X' % (r(),r(),r())
   users[user] = {
     'mapId': 'default',
+    'colour': colour,
     'cx': 0,
     'cy': 0
   }
 
   data = [
     user,
+    colour,
     {k:v for k,v in MAPS['default'].items() if k in ('map')},
     users
   ]

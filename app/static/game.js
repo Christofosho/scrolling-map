@@ -15,6 +15,7 @@ var tb = 50; // Tile Buffer: How large tiles are
 // character start (0,0)
 var cx = 0;
 var cy = 0;
+var colour = "red";
 
 var map = [];
 
@@ -45,7 +46,7 @@ function draw() {
   drawOthers();
 
   // Fill the character tile (TEMP)
-  ctx.fillStyle = "red";
+  ctx.fillStyle = colour;
   ctx.fillRect(4*tb, 4*tb, tb, tb);
 }
 
@@ -59,7 +60,7 @@ function drawOthers() {
       y = ucy - cy;
       if (x >= -4 && x <= 4 && y >= -4 && y <= 4) {
         // Fill the character tile (TEMP)
-        ctx.fillStyle = "red";
+        ctx.fillStyle = all_users[u]['colour'];
         ctx.fillRect((x+4)*tb, (y+4)*tb, tb, tb);
       }
     }
@@ -115,7 +116,8 @@ var stop_var;
       if (DEBUG) console.log('Got map data!');
       data = JSON.parse(data);
       user = data[0];
-      map  = data[1]['map'];
+      colour = data[1];
+      map  = data[2]['map'];
       if (DEBUG) console.log('Executing main..');
       main(); // Start the cycle
     });
