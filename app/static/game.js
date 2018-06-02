@@ -10,11 +10,14 @@ var user = 0;
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-var tb = 50; // Tile Buffer: How large tiles are
+var tb = 0; // Tile Buffer: How large tiles are
 
 // character start (0,0)
 var cx = 0;
 var cy = 0;
+var sx = 0;
+var sy = 0;
+
 var colour = "red";
 
 var map = [];
@@ -33,7 +36,7 @@ function draw() {
     for (y=0; y < canvas.clientHeight; y += tb) {
       ctx.beginPath();
       ctx.strokeStyle = "grey";
-      ctx.fillStyle = colours[map[y/tb+cy][x/tb+cx]];
+      ctx.fillStyle = colours[map[y/tb+(cy-sy)][x/tb+(cx-sx)]];
       ctx.fillRect(x, y, tb, tb);
       ctx.moveTo(x, y);
       ctx.lineTo(x + tb, y);
@@ -48,9 +51,9 @@ function draw() {
 
   // Fill the character tile (TEMP)
   ctx.fillStyle = colour;
-  ctx.fillRect(4*tb, 4*tb, tb, tb);
+  ctx.fillRect(sx*tb, sy*tb, tb, tb);
   ctx.strokeStyle = "white";
-  ctx.strokeText("(" + cx + ", " + cy + ")", 5, 15);
+  ctx.strokeText("(" + cx + ", " + cy + ")", 3, 15);
 }
 
 function drawOthers() {
@@ -61,10 +64,10 @@ function drawOthers() {
       ucy = all_users[u]['cy'];
       x = ucx - cx;
       y = ucy - cy;
-      if (x >= -4 && x <= 4 && y >= -4 && y <= 4) {
+      if (x >= -sx && x <= sx && y >= -sy && y <= sy) {
         // Fill the character tile (TEMP)
         ctx.fillStyle = all_users[u]['colour'];
-        ctx.fillRect((x+4)*tb, (y+4)*tb, tb, tb);
+        ctx.fillRect((x+sx)*tb, (y+sy)*tb, tb, tb);
       }
     }
   }
@@ -119,8 +122,13 @@ var stop_var;
       if (DEBUG) console.log('Got map data!');
       data = JSON.parse(data);
       user = data[0];
-      colour = data[1];
-      map  = data[2]['map'];
+      cx = data[1][0];
+      cy = data[1][1];
+      colour = data[2];
+      map  = data[3]['map'];
+      tb = data[3]['tb'];
+      sx = data[3]['sx'];
+      sy = data[3]['sy'];
       if (DEBUG) console.log('Executing main..');
       main(); // Start the cycle
     });
