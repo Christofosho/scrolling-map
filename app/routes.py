@@ -57,12 +57,14 @@ def connect():
 
   data = [
     user,
-    {k:v for k,v in MAPS['default'].items() if k in ('map')}
+    {k:v for k,v in MAPS['default'].items() if k in ('map')},
+    users
   ]
 
   print ("User " + user + " has connected.")
 
   emit('map_data', json.dumps(data), room=request.sid)
+  socketio.emit('update_all', json.dumps(users))
 
 @socketio.on('disconnect')
 def disconnect():
@@ -72,12 +74,12 @@ def disconnect():
 def move(data):
   data = json.loads(data)
 
-  direction = data['direction']
-  if direction not in COMMANDS:
-    return
-
   user = users.get(data['user'])
   if not user:
+    return
+
+  direction = data['direction']
+  if direction not in COMMANDS:
     return
 
   cx = curr_cx = user.get('cx')

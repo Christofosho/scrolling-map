@@ -1,6 +1,6 @@
 /* INITIALIZING */
 var server = 1; // is connected to server
-var DEBUG = 1;
+var DEBUG = 0;
 
 if (server)
   var socket = io.connect('//' + document.domain + ':' + location.port);
@@ -124,7 +124,6 @@ var stop_var;
     // Moves the local player
     socket.on('movement_self', function (data) {
       data = JSON.parse(data);
-      console.log(user, data);
       if (user == data['user'])
         if (DEBUG) console.log('Attempting move..');
         doMove(data);
