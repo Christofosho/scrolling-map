@@ -132,7 +132,6 @@ var stop_var;
     data = JSON.parse(data);
     map  = data[0];
     colours = data[1];
-    main(); // Start the cycle
   });
 
   // Moves the local player
@@ -144,8 +143,7 @@ var stop_var;
 
   // Updates all players
   socket.on('update_all', function (data) {
-    data = JSON.parse(data);
-    all_users = data;
+    all_users = JSON.parse(data);
   });
 
   socket.on('failure', function (data) {
