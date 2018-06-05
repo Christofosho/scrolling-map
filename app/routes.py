@@ -83,8 +83,8 @@ def move(data):
     cx = curr_cx = user.get('cx')
     cy = curr_cy = user.get('cy')
     current_map['map'][cy][cx] = data['user']
-    map_data = [current_map['map'], colours]
-    emit('map_data', json.dumps(map_data), room=request.sid)
+    map_data = [cx, cy, data['user']]
+    socketio.emit('map_data', json.dumps(map_data))
 
   else:
     cx = curr_cx = user.get('cx')

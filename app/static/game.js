@@ -138,8 +138,7 @@ var stop_var;
   // Recieves and populates map data.
   socket.on('map_data', function (data) {
     data = JSON.parse(data);
-    map  = data[0];
-    colours = data[1];
+    map[data[1]][data[0]]  = data[2];
   });
 
   // Moves the local player
