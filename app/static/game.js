@@ -103,9 +103,17 @@ function listener() {
 
 var stop_var;
 (function () {
-  function main( tFrame ) {
+  function main( timestamp ) {
+    if (!last) {
+      var last = timestamp
+      draw();
+    }
+    else {
+      if (timestamp - start > 100) {
+        draw();
+      }
+    }
     stop_var = requestAnimationFrame( main );
-    draw();
   }
 
   socket.on('connect', function() {
