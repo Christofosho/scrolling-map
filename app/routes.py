@@ -53,14 +53,14 @@ def connect():
     user,
     [defaultx, defaulty],
     colour,
-    current_map,
-    colours
+    current_map
   ]
 
   print ("User " + user + " has connected.")
 
   emit('init_data', json.dumps(data), room=request.sid)
   socketio.emit('update_all', json.dumps(users))
+  socketio.emit('colours', json.dumps(colours))
 
 @socketio.on('disconnect')
 def disconnect():

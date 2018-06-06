@@ -28,12 +28,16 @@ var colours = {
 var all_users = {};
 
 /* DRAWING */
+ctx.font = "11pt Verdana";
+ctx.textAlign = "end";
+var w = canvas.clientWidth;
+var h = canvas.clientHeight - 20;
 function draw() {
   if (!(old_cx == cx && old_cy == cy)) {
-    for (x=0; x < canvas.clientWidth; x += tb) {
+    for (x=0; x < w; x += tb) {
       var curr_x = x/tb+(cx-sx);
       var tb_x = x + tb;
-      for (y=0; y < canvas.clientHeight; y += tb) {
+      for (y=0; y < h; y += tb) {
         ctx.beginPath();
         ctx.strokeStyle = "grey";
         ctx.fillStyle = colours[map[y/tb+(cy-sy)][curr_x]];
@@ -53,8 +57,14 @@ function draw() {
   // Fill the character tile (TEMP)
   ctx.fillStyle = colour;
   ctx.fillRect(sx*tb, sy*tb, tb, tb);
-  ctx.strokeStyle = "white";
-  ctx.strokeText("(" + cx + ", " + cy + ")", 3, 15);
+
+  // Fill the position
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+  ctx.strokeText(
+    "(" + cx + ", " + cy + ")",
+    14*tb+30, 15*tb+15
+  );
 }
 
 function drawOthers() {
@@ -131,14 +141,18 @@ var stop_var;
     tb = data[3]['tb'];
     sx = data[3]['sx'];
     sy = data[3]['sy'];
-    colours = data[4];
     main(); // Start the cycle
+  });
+
+  socket.on('colours', function (data) {
+    colours = JSON.parse(data);
   });
 
   // Recieves and populates map data.
   socket.on('map_data', function (data) {
     data = JSON.parse(data);
     map[data[1]][data[0]]  = data[2];
+
   });
 
   // Moves the local player
