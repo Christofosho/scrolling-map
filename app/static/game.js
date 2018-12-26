@@ -95,7 +95,7 @@ function sendAction(e) {
 
   socket.emit('json', JSON.stringify({
     'user': user,
-    'direction': e.keyCode,
+    'action': e.keyCode,
   }))
 }
 
