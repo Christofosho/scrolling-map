@@ -5,12 +5,24 @@ from flask_socketio import emit
 import json
 import random
 import time
-import uuid
 
-from app.constants import defaultx, defaulty, SPACEBAR, users
+from app.constants import DEFAULT_X, DEFAULT_Y, SPACEBAR, TILE_BUFFER, users
 from app.helpers import is_input_bad, check_direction, move_self, handle_pickup
 from app.definitions import TILES, MAPS
 
+
+""" handle_connect(socket, request)
+
+  Initializes new users in the users dictionary. Provides
+  an updates user list to all users.
+
+  In:
+    socket: socket object,
+    request: request object
+
+  Out:
+    None
+"""
 def handle_connect(socket, request):
   user = request.sid
 
@@ -18,19 +30,20 @@ def handle_connect(socket, request):
   colour = '#%02X%02X%02X' % (r(),r(),r())
   users[user] = {
     'id': user,
-    'mapId': 'small',
+    'mapId': 'large',
     'colour': colour,
-    'cx': defaultx,
-    'cy': defaulty,
+    'cx': DEFAULT_X,
+    'cy': DEFAULT_Y,
     'bag': [],
     'lastAction': int(time.time() * 1000) # Milliseconds
   }
 
   data = [
     user,
-    [defaultx, defaulty],
+    [DEFAULT_X, DEFAULT_Y],
     colour,
-    MAPS[users[user].get('mapId')]
+    MAPS[users[user].get('mapId')],
+    [TILE_BUFFER, DEFAULT_X, DEFAULT_Y]
   ]
 
   print ("User " + user + " has connected.")
@@ -42,6 +55,10 @@ def handle_connect(socket, request):
 
 
 """ distribute(socket, request, data, owner)
+
+  Handles user input, calling a function based on the input
+  and sending an update to the client(s) based on the result.
+
   In:
     socket: socket object,
     request: request object,
@@ -80,6 +97,19 @@ def distribute(socket, request, data, owner):
   if action_occurred:
     owner['lastAction'] = int(time.time() * 1000) # Milliseconds
 
+
+""" handle_disconnect(socket, request)
+
+  Removes a user from the list and updates
+  all users with the new user list.
+
+  In:
+    socket: socket object,
+    request: request object
+
+  Out:
+    None
+"""
 def handle_disconnect(socket, request):
   users.pop(request.sid, 0)
   print ("User " + request.sid + " has disconnected.")

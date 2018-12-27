@@ -29,23 +29,21 @@ def move_self(user, direction):
   cy = curr_cy = user.get('cy')
   map_data = MAPS.get(user.get('mapId'))
   curr_map = map_data['map']
-  sx = map_data['sx']
-  sy = map_data['sy']
-  ex = len(curr_map[0]) - sx
-  ey = len(curr_map) - sy
-  noWalkTiles = map_data['noWalk']
+  ex = len(curr_map[0]) - DEFAULT_X
+  ey = len(curr_map) - DEFAULT_Y
+  tile_options = map_data['tile_options']
 
-  cx, cy = check_direction(direction, cx, cy, sx, sy, ex, ey)
+  cx, cy = check_direction(direction, cx, cy, ex, ey)
+  blocked = tile_options[curr_map[cy][cx]] & BLOCKING
 
-  if (curr_map[cy][cx] not in noWalkTiles
-      and (cx != curr_cx or cy != curr_cy)):
+  if not(blocked) and (cx != curr_cx or cy != curr_cy):
     return True, cx, cy
   return False, cx, cy
 
-def check_direction(direction, cx, cy, sx, sy, ex, ey):
+def check_direction(direction, cx, cy, ex, ey):
   # Left
   if direction in (37, 65):
-    if cx > sx: # Boundary check
+    if cx > DEFAULT_X: # Boundary check
       cx -= 1
 
   # Right
@@ -60,7 +58,7 @@ def check_direction(direction, cx, cy, sx, sy, ex, ey):
 
   # Up
   elif direction in (38, 87):
-    if cy > sy: # Boundary check
+    if cy > DEFAULT_Y: # Boundary check
       cy -= 1
 
   return cx, cy

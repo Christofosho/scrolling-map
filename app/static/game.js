@@ -6,7 +6,7 @@ var user = 0;
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-var tb = 0; // Tile Buffer: How large tiles are
+var tile_buffer = 0; // Tile Buffer: How large tiles are
 
 // character start (0,0)
 var cx = old_cx = 0;
@@ -30,18 +30,17 @@ var w = canvas.clientWidth;
 var h = canvas.clientHeight - 20;
 function draw() {
   if (!(old_cx == cx && old_cy == cy)) {
-    for (x=0; x < w; x += tb) {
-      var curr_x = x/tb+(cx-sx);
-      var tb_x = x + tb;
-      for (y=0; y < h; y += tb) {
+    for (x=0; x < w; x += tile_buffer) {
+      var curr_x = x/tile_buffer+(cx-sx);
+      var tb_x = x + tile_buffer;
+      for (y=0; y < h; y += tile_buffer) {
         ctx.beginPath();
-        ctx.strokeStyle = "grey";
-        ctx.fillStyle = colours[map[y/tb+(cy-sy)][curr_x]];
-        ctx.fillRect(x, y, tb, tb);
+        ctx.fillStyle = ctx.strokeStyle = colours[map[y/tile_buffer+(cy-sy)][curr_x]];
+        ctx.fillRect(x, y, tile_buffer, tile_buffer);
         ctx.moveTo(x, y);
         ctx.lineTo(tb_x, y);
         ctx.moveTo(x, y);
-        ctx.lineTo(x, y + tb);
+        ctx.lineTo(x, y + tile_buffer);
         ctx.stroke();
         ctx.closePath();
       }
@@ -52,14 +51,14 @@ function draw() {
 
   // Fill the character tile (TEMP)
   ctx.fillStyle = colour;
-  ctx.fillRect(sx*tb, sy*tb, tb, tb);
+  ctx.fillRect(sx*tile_buffer, sy*tile_buffer, tile_buffer, tile_buffer);
 
   // Fill the position
   ctx.fillStyle = "white";
   ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
   ctx.strokeText(
     "(" + cx + ", " + cy + ")",
-    14*tb+30, 15*tb+15
+    14*tile_buffer+30, 15*tile_buffer+15
   );
 }
 
@@ -74,7 +73,7 @@ function drawOthers() {
       if (x >= -sx && x <= sx && y >= -sy && y <= sy) {
         // Fill the character tile (TEMP)
         ctx.fillStyle = all_users[u]['colour'];
-        ctx.fillRect((x+sx)*tb, (y+sy)*tb, tb, tb);
+        ctx.fillRect((x+sx)*tile_buffer, (y+sy)*tile_buffer, tile_buffer, tile_buffer);
       }
     }
   }
@@ -134,9 +133,9 @@ var stop_var;
     cy = data[1][1];
     colour = data[2];
     map  = data[3]['map'];
-    tb = data[3]['tb'];
-    sx = data[3]['sx'];
-    sy = data[3]['sy'];
+    tile_buffer = data[4][0];
+    sx = data[4][1];
+    sy = data[4][2];
     main(); // Start the cycle
   });
 

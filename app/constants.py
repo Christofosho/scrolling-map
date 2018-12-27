@@ -19,8 +19,12 @@ movement = (
   A, W, D, S
 )
 
-defaultx = 7
-defaulty = 7
+BORDER_TILES = 7 # Used to ensure user doesn't fall off the map.
+DEFAULT_X = 7
+DEFAULT_Y = 7
+TILE_BUFFER = 30
+
+BLOCKING = 1
 
 # Not actually contant - TODO later.
 users = {}
