@@ -22,8 +22,5 @@ movement = (
 defaultx = 7
 defaulty = 7
 
-# Not actually contants - TODO later.
+# Not actually contant - TODO later.
 users = {}
-
-from app.maps import MAPS
-current_map = dict(MAPS['default']) # Take a copy

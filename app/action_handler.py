@@ -7,20 +7,18 @@ import random
 import time
 import uuid
 
-from app.constants import defaultx, defaulty, SPACEBAR, users, current_map
+from app.constants import defaultx, defaulty, SPACEBAR, users
 from app.helpers import is_input_bad, check_direction, move_self, handle_pickup
-from app.maps import colours
+from app.definitions import TILES, MAPS
 
 def handle_connect(socket, request):
   user = request.sid
 
   r = lambda: random.randint(0, 255)
   colour = '#%02X%02X%02X' % (r(),r(),r())
-  colours[user] = colour
-
   users[user] = {
     'id': user,
-    'mapId': 'default',
+    'mapId': 'small',
     'colour': colour,
     'cx': defaultx,
     'cy': defaulty,
@@ -32,14 +30,14 @@ def handle_connect(socket, request):
     user,
     [defaultx, defaulty],
     colour,
-    current_map
+    MAPS[users[user].get('mapId')]
   ]
 
   print ("User " + user + " has connected.")
 
   emit('init_data', json.dumps(data), room=request.sid)
   socket.emit('update_all', json.dumps(users))
-  socket.emit('colours', json.dumps(colours))
+  socket.emit('colours', json.dumps(TILES))
 
 
 
@@ -54,6 +52,8 @@ def handle_connect(socket, request):
     None
 """
 def distribute(socket, request, data, owner):
+  action_occurred = False
+
   action = data['action']
   if is_input_bad(action, owner):
     return
@@ -61,6 +61,7 @@ def distribute(socket, request, data, owner):
   if action == SPACEBAR:
     map_data = handle_pickup(owner)
     socket.emit('map_data', json.dumps(map_data))
+    action_occurred = True
 
   else:
     moved, cx, cy = move_self(owner, action)
@@ -72,12 +73,14 @@ def distribute(socket, request, data, owner):
         'cx': cx,
         'cy': cy
       }), room=request.sid)
+      action_occurred = True
 
     socket.emit('update_all', json.dumps(users))
 
-  owner['lastAction'] = int(time.time() * 1000) # Milliseconds
-  print(owner['lastAction'])
+  if action_occurred:
+    owner['lastAction'] = int(time.time() * 1000) # Milliseconds
 
 def handle_disconnect(socket, request):
   users.pop(request.sid, 0)
+  print ("User " + request.sid + " has disconnected.")
   socket.emit('update_all', json.dumps(users))

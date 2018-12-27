@@ -3,7 +3,6 @@ from flask import request, render_template
 import json
 
 from app import a, socketio
-from app.maps import colours, MAPS
 
 from app.action_handler import *
 

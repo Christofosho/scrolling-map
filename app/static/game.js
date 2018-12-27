@@ -20,11 +20,7 @@ var colour = "red";
 var map = [];
 
 /* MAP OPTIONS */
-var colours = {
-  0: "blue",
-  1: "green"
-};
-
+var colours = {};
 var all_users = {};
 
 /* DRAWING */
@@ -152,7 +148,6 @@ var stop_var;
   socket.on('map_data', function (data) {
     data = JSON.parse(data);
     map[data[1]][data[0]]  = data[2];
-
   });
 
   // Moves the local player

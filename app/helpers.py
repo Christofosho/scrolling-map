@@ -2,7 +2,7 @@
 
 import time
 
-from app.maps import MAPS
+from app.definitions import MAPS
 from app.constants import *
 
 def is_input_bad(action, owner):
@@ -31,8 +31,8 @@ def move_self(user, direction):
   curr_map = map_data['map']
   sx = map_data['sx']
   sy = map_data['sy']
-  ex = map_data['ex']
-  ey = map_data['ey']
+  ex = len(curr_map[0]) - sx
+  ey = len(curr_map) - sy
   noWalkTiles = map_data['noWalk']
 
   cx, cy = check_direction(direction, cx, cy, sx, sy, ex, ey)
