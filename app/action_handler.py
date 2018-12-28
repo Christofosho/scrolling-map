@@ -6,7 +6,8 @@ import json
 import random
 import time
 
-from app.constants import DEFAULT_X, DEFAULT_Y, SPACEBAR, TILE_BUFFER, users
+from app.constants import DEFAULT_X, DEFAULT_Y, SPACEBAR, TILE_BUFFER
+from app.constants import DIRECTION_OFFSETS, MOVEMENTS, users
 from app.helpers import is_input_bad, check_direction, move_self, handle_pickup
 from app.definitions import TILES, MAPS
 
@@ -34,13 +35,14 @@ def handle_connect(socket, request):
     'colour': colour,
     'cx': DEFAULT_X,
     'cy': DEFAULT_Y,
+    'direction': 0,
     'bag': [],
     'lastAction': int(time.time() * 1000) # Milliseconds
   }
 
   data = [
     user,
-    [DEFAULT_X, DEFAULT_Y],
+    [DEFAULT_X, DEFAULT_Y, 0],
     colour,
     MAPS[users[user].get('mapId')],
     [TILE_BUFFER, DEFAULT_X, DEFAULT_Y]
@@ -49,8 +51,8 @@ def handle_connect(socket, request):
   print ("User " + user + " has connected.")
 
   emit('init_data', json.dumps(data), room=request.sid)
+  socket.emit('tiles', json.dumps(TILES))
   socket.emit('update_all', json.dumps(users))
-  socket.emit('colours', json.dumps(TILES))
 
 
 
@@ -68,10 +70,9 @@ def handle_connect(socket, request):
   Out:
     None
 """
-def distribute(socket, request, data, owner):
+def distribute(socket, request, owner, action):
   action_occurred = False
 
-  action = data['action']
   if is_input_bad(action, owner):
     return
 
@@ -80,18 +81,20 @@ def distribute(socket, request, data, owner):
     socket.emit('map_data', json.dumps(map_data))
     action_occurred = True
 
-  else:
+  elif action in MOVEMENTS:
     moved, cx, cy = move_self(owner, action)
+    owner['direction'] = DIRECTION_OFFSETS[action]
     if moved:
-      users[data['user']]['cx'] = cx
-      users[data['user']]['cy'] = cy
-      emit('movement_self', json.dumps({
-        'user': data['user'],
-        'cx': cx,
-        'cy': cy
-      }), room=request.sid)
+      owner['cx'] = cx
+      owner['cy'] = cy
       action_occurred = True
 
+    emit('movement_self', json.dumps({
+      'user': owner['id'],
+      'cx': cx,
+      'cy': cy,
+      'direction': owner['direction']
+    }), room=request.sid)
     socket.emit('update_all', json.dumps(users))
 
   if action_occurred:

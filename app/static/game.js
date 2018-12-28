@@ -11,16 +11,21 @@ var tile_buffer = 0; // Tile Buffer: How large tiles are
 // character start (0,0)
 var cx = old_cx = 0;
 var cy = old_cy = 0;
+var dir = old_dir = 0;
 
 var sx = 0;
 var sy = 0;
 
-var colour = "red";
+var tilesheet = new Image();
+tilesheet.src = "static/tilesheet.png";
+
+var charsheet = new Image();
+charsheet.src = "static/charsheet.png";
 
 var map = [];
 
 /* MAP OPTIONS */
-var colours = {};
+var tiles = {};
 var all_users = {};
 
 /* DRAWING */
@@ -29,29 +34,31 @@ ctx.textAlign = "end";
 var w = canvas.clientWidth;
 var h = canvas.clientHeight - 20;
 function draw() {
-  if (!(old_cx == cx && old_cy == cy)) {
-    for (x=0; x < w; x += tile_buffer) {
-      var curr_x = x/tile_buffer+(cx-sx);
-      var tb_x = x + tile_buffer;
-      for (y=0; y < h; y += tile_buffer) {
-        ctx.beginPath();
-        ctx.fillStyle = ctx.strokeStyle = colours[map[y/tile_buffer+(cy-sy)][curr_x]];
-        ctx.fillRect(x, y, tile_buffer, tile_buffer);
-        ctx.moveTo(x, y);
-        ctx.lineTo(tb_x, y);
-        ctx.moveTo(x, y);
-        ctx.lineTo(x, y + tile_buffer);
-        ctx.stroke();
-        ctx.closePath();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (x=0; x < w; x += tile_buffer) {
+    var curr_x = x/tile_buffer+(cx-sx);
+    for (y=0; y < h; y += tile_buffer) {
+      tile = map[y/tile_buffer+(cy-sy)][curr_x];
+      if (Array.isArray(tile)) {
+        for (var def in tile) {
+          drawTile(tile[def], x, y);
+        }
+      }
+      else {
+        drawTile(tile, x, y);
       }
     }
   }
 
   drawOthers();
 
-  // Fill the character tile (TEMP)
-  ctx.fillStyle = colour;
-  ctx.fillRect(sx*tile_buffer, sy*tile_buffer, tile_buffer, tile_buffer);
+  // Fill the local character tile
+  if (charsheet.complete) {
+    drawPlayer(sx, sy, dir);
+  }
+  else {
+    charsheet.addEventListener('load', drawPlayer);
+  }
 
   // Fill the position
   ctx.fillStyle = "white";
@@ -60,6 +67,34 @@ function draw() {
     "(" + cx + ", " + cy + ")",
     14*tile_buffer+30, 15*tile_buffer+15
   );
+}
+
+function drawTile(tile, x, y) {
+  ctx.beginPath();
+  if (tilesheet.complete) {
+    drawImage(tile, x, y);
+  }
+  else {
+    tilesheet.load = drawImage.bind(tile, x, y);
+  }
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + tile_buffer, y);
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y + tile_buffer);
+  ctx.stroke();
+  ctx.closePath();
+}
+
+function drawPlayer(x_, y_, direction) {
+  ctx.strokeStyle = "transparent";
+  ctx.drawImage(charsheet, direction * tile_buffer, 0,
+    tile_buffer, tile_buffer, x_*tile_buffer, y_*tile_buffer, tile_buffer, tile_buffer)
+}
+
+function drawImage(tile, x, y) {
+  ctx.strokeStyle = "transparent";
+  ctx.drawImage(tilesheet, (tile % 10) * tile_buffer, Math.floor(tile / 10) * tile_buffer,
+    tile_buffer, tile_buffer, x, y, tile_buffer, tile_buffer);
 }
 
 function drawOthers() {
@@ -71,13 +106,13 @@ function drawOthers() {
       x = ucx - cx;
       y = ucy - cy;
       if (x >= -sx && x <= sx && y >= -sy && y <= sy) {
-        // Fill the character tile (TEMP)
-        ctx.fillStyle = all_users[u]['colour'];
-        ctx.fillRect((x+sx)*tile_buffer, (y+sy)*tile_buffer, tile_buffer, tile_buffer);
+        // Fill the character tile
+        drawPlayer(x+sx, y+sy, all_users[u]['direction'])
       }
     }
   }
 }
+
 
 /* MOVEMENT */
 function sendAction(e) {
@@ -97,8 +132,10 @@ function sendAction(e) {
 function doMove(movement) {
   old_cx = cx;
   old_cy = cy;
+  old_dir = dir;
   cx = movement['cx'];
   cy = movement['cy'];
+  dir = movement['direction'];
 }
 
 function listener() {
@@ -131,6 +168,7 @@ var stop_var;
     user = data[0];
     cx = data[1][0];
     cy = data[1][1];
+    dir = data[1][2];
     colour = data[2];
     map  = data[3]['map'];
     tile_buffer = data[4][0];
@@ -139,8 +177,8 @@ var stop_var;
     main(); // Start the cycle
   });
 
-  socket.on('colours', function (data) {
-    colours = JSON.parse(data);
+  socket.on('tiles', function (data) {
+    tiles = JSON.parse(data);
   });
 
   // Recieves and populates map data.
@@ -158,6 +196,7 @@ var stop_var;
 
   // Updates all players
   socket.on('update_all', function (data) {
+    console.log(data);
     all_users = JSON.parse(data);
   });
 

@@ -22,10 +22,11 @@ def disconnect():
 def action(data):
   data = json.loads(data)
 
-  owner = users.get(data['user'])
-  if not owner or (data['user'] != request.sid):
+  owner = users.get(data.get('user'))
+  if not owner or (data.get('user') != request.sid):
     return disconnect()
 
-  distribute(socketio, request, data, owner)
+  action = data.get('action')
+  distribute(socketio, request, owner, action)
 
 a.secret_key = 'fake'

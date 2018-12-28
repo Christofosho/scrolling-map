@@ -8,8 +8,8 @@ from app.constants import *
 def is_input_bad(action, owner):
   bad_input = action not in codes
   action_time = int(time.time() * 1000) # Milliseconds
-  bad_movement = (action in movement and (action_time - owner.get('lastAction') < 300))
-  bad_action = (action not in movement and (action_time - owner.get('lastAction') < 600))
+  bad_movement = (action in MOVEMENTS and (action_time - owner.get('lastAction') < 300))
+  bad_action = (action not in MOVEMENTS and (action_time - owner.get('lastAction') < 600))
 
   bad = bad_input or bad_action or bad_movement
   if bad:
@@ -34,11 +34,15 @@ def move_self(user, direction):
   tile_options = map_data['tile_options']
 
   cx, cy = check_direction(direction, cx, cy, ex, ey)
-  blocked = tile_options[curr_map[cy][cx]] & BLOCKING
+  tile = curr_map[cy][cx]
+  if (type(tile) == list):
+    blocked = any([x & BLOCKING for x in tile])
+  else:
+    blocked = tile_options[tile] & BLOCKING
 
   if not(blocked) and (cx != curr_cx or cy != curr_cy):
     return True, cx, cy
-  return False, cx, cy
+  return False, curr_cx, curr_cy
 
 def check_direction(direction, cx, cy, ex, ey):
   # Left
