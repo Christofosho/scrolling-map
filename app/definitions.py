@@ -1,12 +1,13 @@
 import json
-import os
-current_directory = os.path.dirname(__file__)
+from pathlib import Path
 
 MAPS = {}
 TILES = {}
 
-with open(current_directory + '\\resources\\maps.json') as m:
+RESOURCES = Path('app', 'resources')
+
+with open(RESOURCES / 'maps.json') as m:
   MAPS = json.load(m)
 
-with open(current_directory + '\\resources\\tiles.json') as t:
+with open(RESOURCES / 'tiles.json') as t:
   TILES = json.load(t)
