@@ -129,6 +129,44 @@ function sendAction(e) {
   }))
 }
 
+function determineClick(e) {
+  click_x = e.offsetX;
+  click_y = e.offsetY;
+
+  if (polygon_click_test(3, [0, 225, 450], [0, 225, 0], click_x, click_y)) {
+    sendAction({'keyCode': 38, 'preventDefault': function(){}}); // Up
+  }
+  else if (polygon_click_test(3, [0, 225, 450], [450, 225, 450], click_x, click_y)) {
+    sendAction({'keyCode': 40, 'preventDefault': function(){}}); // Down
+  }
+  else if (polygon_click_test(3, [0, 225, 0], [0, 225, 450], click_x, click_y)) {
+    sendAction({'keyCode': 37, 'preventDefault': function(){}}); // Left
+  }
+  else if (polygon_click_test(3, [450, 225, 450], [0, 225, 450], click_x, click_y)) {
+    sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Right
+  }
+
+  canvas.addEventListener('mouseup', clickListener);
+  canvas.addEventListener('touchend', clickListener);
+}
+
+// polygon_click_test by Wm. Randolph Franklin
+// int list(int) list(int) int int -> bool
+// Consumes the number of vertices, along with each vertex coordinate,
+// as a list of x coordinates and a second list of y coordinates.
+// Tests against clicked coordinates to determine whether the
+// click was within the polygon formed by said vertices.
+function polygon_click_test( nvert, vertx, verty, testx, testy ) {
+    var i, j, c = false;
+    for( i = 0, j = nvert-1; i < nvert; j = i++ ) {
+        if( ( ( verty[i] > testy ) != ( verty[j] > testy ) ) &&
+            ( testx < ( vertx[j] - vertx[i] ) * ( testy - verty[i] ) / ( verty[j] - verty[i] ) + vertx[i] ) ) {
+                c = !c;
+        }
+    }
+    return c;
+}
+
 function doMove(movement) {
   old_cx = cx;
   old_cy = cy;
@@ -141,6 +179,15 @@ function doMove(movement) {
 function listener() {
   document.removeEventListener('keydown', sendAction);
   document.addEventListener('keydown', sendAction);
+}
+
+function clickListener() {
+  canvas.removeEventListener('mousedown', determineClick);
+  canvas.removeEventListener('touchstart', determineClick);
+  canvas.removeEventListener('mouseup', clickListener);
+  canvas.removeEventListener('touchend', clickListener);
+  canvas.addEventListener('mousedown', determineClick);
+  canvas.addEventListener('touchstart', determineClick);
 }
 
 var stop_var;
@@ -159,7 +206,8 @@ var stop_var;
   }
 
   socket.on('connect', function() {
-    listener(); // Begin movement listener
+    listener(); // Begin movement listeners
+    clickListener();
   });
 
   // Recieves and populates initial data.
@@ -169,11 +217,10 @@ var stop_var;
     cx = data[1][0];
     cy = data[1][1];
     dir = data[1][2];
-    colour = data[2];
-    map  = data[3]['map'];
-    tile_buffer = data[4][0];
-    sx = data[4][1];
-    sy = data[4][2];
+    map  = data[2]['map'];
+    tile_buffer = data[3][0];
+    sx = data[3][1];
+    sy = data[3][2];
     main(); // Start the cycle
   });
 
@@ -196,7 +243,6 @@ var stop_var;
 
   // Updates all players
   socket.on('update_all', function (data) {
-    console.log(data);
     all_users = JSON.parse(data);
   });
 

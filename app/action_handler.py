@@ -28,11 +28,9 @@ def handle_connect(socket, request):
   user = request.sid
 
   r = lambda: random.randint(0, 255)
-  colour = '#%02X%02X%02X' % (r(),r(),r())
   users[user] = {
     'id': user,
     'mapId': 'large',
-    'colour': colour,
     'cx': DEFAULT_X,
     'cy': DEFAULT_Y,
     'direction': 0,
@@ -43,7 +41,6 @@ def handle_connect(socket, request):
   data = [
     user,
     [DEFAULT_X, DEFAULT_Y, 0],
-    colour,
     MAPS[users[user].get('mapId')],
     [TILE_BUFFER, DEFAULT_X, DEFAULT_Y]
   ]
