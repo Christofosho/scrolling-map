@@ -1,15 +1,15 @@
-## Action Handler
+### handler.py
+# Handles user input.
 
-from flask_socketio import emit
-
-import json
-import random
 import time
 
 from app.constants import DEFAULT_X, DEFAULT_Y, SPACEBAR, TILE_BUFFER
 from app.constants import DIRECTION_OFFSETS, MOVEMENTS, users
-from app.helpers import is_input_bad, check_direction, move_self, handle_pickup
-from app.definitions import TILES, MAPS
+from app.definitions import MAPS, TILES
+from app.helpers import is_input_bad, handle_pickup
+from app.movement import move_self
+
+from app import sender
 
 
 """ handle_connect(socket, request)
@@ -18,16 +18,14 @@ from app.definitions import TILES, MAPS
   an updates user list to all users.
 
   In:
-    socket: socket object,
-    request: request object
+    socket: obj (socket object),
+    request: obj (request object)
 
   Out:
     None
 """
 def handle_connect(socket, request):
   user = request.sid
-
-  r = lambda: random.randint(0, 255)
   users[user] = {
     'id': user,
     'mapId': 'large',
@@ -47,9 +45,9 @@ def handle_connect(socket, request):
 
   print ("User " + user + " has connected.")
 
-  emit('init_data', json.dumps(data), room=request.sid)
-  socket.emit('tiles', json.dumps(TILES))
-  socket.emit('update_all', json.dumps(users))
+  sender.send_initialize_player(request, data)
+  sender.send_tile_data(socket, TILES)
+  sender.update_all_players(socket, users)
 
 
 
@@ -59,23 +57,23 @@ def handle_connect(socket, request):
   and sending an update to the client(s) based on the result.
 
   In:
-    socket: socket object,
-    request: request object,
-    data: recieved data,
-    owner: sender
+    socket: obj (socket object),
+    request: obj (request object),
+    owner: dict (sender that is performing the action),
+    action: int (action being performed)
 
-  Out:
-    None
 """
-def distribute(socket, request, owner, action):
+def distribute(socket, request, data):
   action_occurred = False
+
+  action = data.get('action')
+  owner = users.get(data.get('user'))
 
   if is_input_bad(action, owner):
     return
 
   if action == SPACEBAR:
-    map_data = handle_pickup(owner)
-    socket.emit('map_data', json.dumps(map_data))
+    sender.send_map_data(socket, handle_pickup(owner))
     action_occurred = True
 
   elif action in MOVEMENTS:
@@ -86,13 +84,8 @@ def distribute(socket, request, owner, action):
       owner['cy'] = cy
       action_occurred = True
 
-    emit('movement_self', json.dumps({
-      'user': owner['id'],
-      'cx': cx,
-      'cy': cy,
-      'direction': owner['direction']
-    }), room=request.sid)
-    socket.emit('update_all', json.dumps(users))
+    sender.send_movement(request, owner)
+    sender.update_all_players(socket, users)
 
   if action_occurred:
     owner['lastAction'] = int(time.time() * 1000) # Milliseconds
@@ -104,13 +97,11 @@ def distribute(socket, request, owner, action):
   all users with the new user list.
 
   In:
-    socket: socket object,
-    request: request object
+    socket: obj (socket object),
+    request: obj (request object)
 
-  Out:
-    None
 """
 def handle_disconnect(socket, request):
   users.pop(request.sid, 0)
   print ("User " + request.sid + " has disconnected.")
-  socket.emit('update_all', json.dumps(users))
+  sender.update_all_players(socket, users)

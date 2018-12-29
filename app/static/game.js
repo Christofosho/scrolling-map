@@ -117,11 +117,21 @@ function drawOthers() {
 /* MOVEMENT */
 function sendAction(e) {
   if (![
-    32, 37, 38, 39, 40, 65, 68, 83, 87
+    32, 37, 38, 39, 40, 65, 68, 69, 83, 87
   ].includes(e.keyCode)) return;
   e.preventDefault();
 
   listener(); // Reset listener.
+
+  if (e.keyCode == 32) { // Spacebar
+    console.log("Eventually we will implement the spacebar for interacting"
+      + " with items below your character.");
+  }
+
+  else if (e.keyCode == 69) {
+    console.log("Eventually we will implement the 'e' key for interacting"
+      + " with nearby npcs and objects, if your player is facing them!");
+  }
 
   socket.emit('json', JSON.stringify({
     'user': user,
@@ -133,7 +143,10 @@ function determineClick(e) {
   click_x = e.offsetX;
   click_y = e.offsetY;
 
-  if (polygon_click_test(3, [0, 225, 450], [0, 225, 0], click_x, click_y)) {
+  if (polygon_click_test(4, [210, 240, 240, 210], [210, 210, 240, 240], click_x, click_y)) {
+    sendAction({'keyCode': 32, 'preventDefault': function(){}}); // Spacebar
+  }
+  else if (polygon_click_test(3, [0, 225, 450], [0, 225, 0], click_x, click_y)) {
     sendAction({'keyCode': 38, 'preventDefault': function(){}}); // Up
   }
   else if (polygon_click_test(3, [0, 225, 450], [450, 225, 450], click_x, click_y)) {
@@ -231,7 +244,6 @@ var stop_var;
   // Recieves and populates map data.
   socket.on('map_data', function (data) {
     data = JSON.parse(data);
-    map[data[1]][data[0]]  = data[2];
   });
 
   // Moves the local player

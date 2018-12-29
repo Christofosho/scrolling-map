@@ -2,9 +2,7 @@ from flask import request, render_template
 
 import json
 
-from app import a, socketio
-
-from app.action_handler import *
+from app import a, authenticator, handler, socketio
 
 @a.route("/", methods=['GET'])
 def index():
@@ -12,21 +10,19 @@ def index():
 
 @socketio.on('connect')
 def connect():
-  handle_connect(socketio, request)
+  handler.handle_connect(socketio, request)
 
 @socketio.on('disconnect')
 def disconnect():
-  handle_disconnect(socketio, request)
+  handler.handle_disconnect(socketio, request)
 
 @socketio.on('json')
 def action(data):
   data = json.loads(data)
 
-  owner = users.get(data.get('user'))
-  if not owner or (data.get('user') != request.sid):
+  if not authenticator.check_exists(request, data):
     return disconnect()
 
-  action = data.get('action')
-  distribute(socketio, request, owner, action)
+  handler.distribute(socketio, request, data)
 
 a.secret_key = 'fake'
