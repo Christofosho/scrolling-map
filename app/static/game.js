@@ -6,6 +6,14 @@ var user = 0;
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
+if (window.innerWidth < 500) {
+  canvas.width = 270;
+  canvas.height = 290;
+}
+
+var mid_width = canvas.width / 2;
+var mid_height = canvas.height / 2;
+
 var tile_buffer = 0; // Tile Buffer: How large tiles are
 
 // character start (0,0)
@@ -143,19 +151,33 @@ function determineClick(e) {
   click_x = e.offsetX;
   click_y = e.offsetY;
 
-  if (polygon_click_test(4, [210, 240, 240, 210], [210, 210, 240, 240], click_x, click_y)) {
+  mid_offset = 15;
+  mid_low = mid_width - mid_offset;
+  mid_high = mid_width - mid_offset;
+  if (polygon_click_test(4,
+    [mid_low, mid_high, mid_high, mid_low], // x values
+    [mid_low, mid_low, mid_high, mid_high], // y values
+    click_x, click_y)) {
     sendAction({'keyCode': 32, 'preventDefault': function(){}}); // Spacebar
   }
-  else if (polygon_click_test(3, [0, 225, 450], [0, 225, 0], click_x, click_y)) {
+  else if (polygon_click_test(3,
+    [0, mid_width, canvas.width], [0, mid_height, 0],
+    click_x, click_y)) {
     sendAction({'keyCode': 38, 'preventDefault': function(){}}); // Up
   }
-  else if (polygon_click_test(3, [0, 225, 450], [450, 225, 450], click_x, click_y)) {
+  else if (polygon_click_test(3,
+    [0, mid_width, canvas.width], [canvas.height, mid_height, canvas.height],
+    click_x, click_y)) {
     sendAction({'keyCode': 40, 'preventDefault': function(){}}); // Down
   }
-  else if (polygon_click_test(3, [0, 225, 0], [0, 225, 450], click_x, click_y)) {
+  else if (polygon_click_test(3,
+    [0, mid_width, 0], [0, mid_height, canvas.height],
+    click_x, click_y)) {
     sendAction({'keyCode': 37, 'preventDefault': function(){}}); // Left
   }
-  else if (polygon_click_test(3, [450, 225, 450], [0, 225, 450], click_x, click_y)) {
+  else if (polygon_click_test(3,
+    [canvas.width, mid_width, canvas.width], [0, mid_height, canvas.height],
+    click_x, click_y)) {
     sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Right
   }
 
@@ -232,8 +254,14 @@ var stop_var;
     dir = data[1][2];
     map  = data[2]['map'];
     tile_buffer = data[3][0];
-    sx = data[3][1];
-    sy = data[3][2];
+    if (canvas.width < 450) {
+      sx = 4;
+      sy = 4;
+    }
+    else {
+      sx = data[3][1];
+      sy = data[3][2];
+    }
     main(); // Start the cycle
   });
 
