@@ -1,57 +1,59 @@
-/* INITIALIZING */
-var socket = io.connect('//' + document.domain + ':' + location.port);
+// game.js
 
-var user = 0;
+/* Initializing */
+const socket = io.connect('//' + document.domain + ':' + location.port);
 
-var canvas = document.getElementById('canvas');
+let user = 0;
+
+const canvas = document.getElementById('canvas');
 canvas.addEventListener("contextmenu",
   function (e) {e.preventDefault();}, false);
 
-var ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d');
 
 if (window.innerWidth < 500) {
   canvas.width = 270;
   canvas.height = 290;
 }
 
-var mid_width = canvas.width / 2;
-var mid_height = canvas.height / 2;
+const mid_width = canvas.width / 2;
+const mid_height = canvas.height / 2;
 
-var tile_buffer = 0; // Tile Buffer: How large tiles are
+let tile_buffer = 0; // Tile Buffer: How large tiles are
 
 // character start (0,0)
-var cx = old_cx = 0;
-var cy = old_cy = 0;
-var dir = old_dir = 0;
+let cx = 0;
+let cy = 0;
+let dir = 0;
 
-var sx = 0;
-var sy = 0;
+let sx = 0;
+let sy = 0;
 
-var tilesheet = new Image();
+const tilesheet = new Image();
 tilesheet.src = "static/tilesheet.png";
 
-var charsheet = new Image();
+const charsheet = new Image();
 charsheet.src = "static/charsheet.png";
 
-var map = [];
+let map = [];
 
 /* MAP OPTIONS */
-var tiles = {};
-var all_users = {};
+let tiles = {};
+let all_users = {};
 
 /* DRAWING */
 ctx.font = "11pt Verdana";
 ctx.textAlign = "end";
-var w = canvas.clientWidth;
-var h = canvas.clientHeight - 20;
+const w = canvas.clientWidth;
+const h = canvas.clientHeight - 20;
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (x=0; x < w; x += tile_buffer) {
-    var curr_x = x/tile_buffer+(cx-sx);
-    for (y=0; y < h; y += tile_buffer) {
-      tile = map[y/tile_buffer+(cy-sy)][curr_x];
+  for (let x = 0; x < w; x += tile_buffer) {
+    const curr_x = x/tile_buffer+(cx-sx);
+    for (let y = 0; y < h; y += tile_buffer) {
+      const tile = map[y/tile_buffer+(cy-sy)][curr_x];
       if (Array.isArray(tile)) {
-        for (var def in tile) {
+        for (const def in tile) {
           drawTile(tile[def], x, y);
         }
       }
@@ -109,13 +111,12 @@ function drawImage(tile, x, y) {
 }
 
 function drawOthers() {
-  var i = 0;
-  for (u in all_users) {
+  for (const u in all_users) {
     if (u != user) {
-      ucx = all_users[u]['cx'];
-      ucy = all_users[u]['cy'];
-      x = ucx - cx;
-      y = ucy - cy;
+      const ucx = all_users[u]['cx'];
+      const ucy = all_users[u]['cy'];
+      const x = ucx - cx;
+      const y = ucy - cy;
       if (x >= -sx && x <= sx && y >= -sy && y <= sy) {
         // Fill the character tile
         drawPlayer(x+sx, y+sy, all_users[u]['direction'])
@@ -152,12 +153,12 @@ function sendAction(e) {
 }
 
 function determineClick(e) {
-  click_x = e.offsetX;
-  click_y = e.offsetY;
+  const click_x = e.offsetX;
+  const click_y = e.offsetY;
 
-  mid_offset = 15;
-  mid_low = mid_width - mid_offset;
-  mid_high = mid_width - mid_offset;
+  const mid_offset = 15;
+  const mid_low = mid_width - mid_offset;
+  const mid_high = mid_width - mid_offset;
   if (polygon_click_test(4,
     [mid_low, mid_high, mid_high, mid_low], // x values
     [mid_low, mid_low, mid_high, mid_high], // y values
@@ -196,7 +197,7 @@ function determineClick(e) {
 // Tests against clicked coordinates to determine whether the
 // click was within the polygon formed by said vertices.
 function polygon_click_test( nvert, vertx, verty, testx, testy ) {
-    var i, j, c = false;
+    let i, j, c = false;
     for( i = 0, j = nvert-1; i < nvert; j = i++ ) {
         if( ( ( verty[i] > testy ) != ( verty[j] > testy ) ) &&
             ( testx < ( vertx[j] - vertx[i] ) * ( testy - verty[i] ) / ( verty[j] - verty[i] ) + vertx[i] ) ) {
@@ -207,9 +208,6 @@ function polygon_click_test( nvert, vertx, verty, testx, testy ) {
 }
 
 function doMove(movement) {
-  old_cx = cx;
-  old_cy = cy;
-  old_dir = dir;
   cx = movement['cx'];
   cy = movement['cy'];
   dir = movement['direction'];
@@ -229,19 +227,19 @@ function clickListener() {
   canvas.addEventListener('touchstart', determineClick);
 }
 
-var stop_var;
+let last;
 (function () {
   function main( timestamp ) {
     if (!last) {
-      var last = timestamp
+      last = timestamp
       draw();
     }
     else {
-      if (timestamp - start > 100) {
+      if (timestamp - last > 100) {
         draw();
       }
     }
-    stop_var = requestAnimationFrame( main );
+    requestAnimationFrame( main );
   }
 
   socket.on('connect', function() {

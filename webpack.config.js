@@ -1,8 +1,10 @@
+const path = require('path');
+
 module.exports = {
   entry: "./js/game.js",
   output: {
-    path: __dirname + "/app/static/",
-    filename: "bundle.js"
+    filename: "bundle.js",
+    path: path.resolve(__dirname, "app", "static")
   },
   mode: "production"
 }
