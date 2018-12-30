@@ -1,7 +1,8 @@
 module.exports = {
   entry: "./js/game.js",
   output: {
-    filename: "./app/static/bundle.js"
+    path: __dirname + "/app/static/",
+    filename: "bundle.js"
   },
-  watch: true
+  mode: "production"
 }

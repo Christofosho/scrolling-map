@@ -2,7 +2,9 @@
   "name": "scrolling-map",
   "version": "1.0.0",
   "description": "It's a map.",
-  "main": "webpack.config.js",
+  "scripts": {
+    "build": "npx webpack"
+  },
   "dependencies": {},
   "devDependencies": {
     "webpack": "^4.28.3",
