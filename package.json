@@ -1,0 +1,29 @@
+{
+  "name": "scrolling-map",
+  "version": "1.0.0",
+  "description": "It's a map.",
+  "main": "webpack.config.js",
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.1.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Christofosho/scrolling-map.git"
+  },
+  "keywords": [
+    "python",
+    "javascript",
+    "canvas"
+  ],
+  "author": "Christopher Snow",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Christofosho/scrolling-map/issues"
+  },
+  "homepage": "https://github.com/Christofosho/scrolling-map#readme"
+}

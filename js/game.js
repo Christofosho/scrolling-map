@@ -4,6 +4,9 @@ var socket = io.connect('//' + document.domain + ':' + location.port);
 var user = 0;
 
 var canvas = document.getElementById('canvas');
+canvas.addEventListener("contextmenu",
+  function (e) {e.preventDefault();}, false);
+
 var ctx = canvas.getContext('2d');
 
 if (window.innerWidth < 500) {
@@ -129,7 +132,8 @@ function sendAction(e) {
   ].includes(e.keyCode)) return;
   e.preventDefault();
 
-  listener(); // Reset listener.
+  listener(); // Reset listeners.
+  clickListener();
 
   if (e.keyCode == 32) { // Spacebar
     console.log("Eventually we will implement the spacebar for interacting"
