@@ -1,157 +1,29 @@
 // game.js
 
 // import '@babel/polyfill';
+import {canvas, draw} from './draw';
 
 /* Initializing */
 const socket = io.connect('//' + document.domain + ':' + location.port);
 
-let user = 0;
+export let user = 0;
+export let all_users = {};
 
-const canvas = document.getElementById('canvas');
-canvas.addEventListener("contextmenu",
-  function (e) {e.preventDefault();}, false);
+// character start (0,0)
+export let cx = 0;
+export let cy = 0;
+export let dir = 0;
 
-const ctx = canvas.getContext('2d');
+export let sx = 0;
+export let sy = 0;
 
-if (window.innerWidth < 500) {
-  canvas.width = 270;
-  canvas.height = 290;
-}
+/* MAP OPTIONS */
+export let map = [];
+export let tiles = {};
+export let tile_buffer = 0; // Tile Buffer: How large tiles are
 
 const mid_width = canvas.width / 2;
 const mid_height = canvas.height / 2;
-
-let tile_buffer = 0; // Tile Buffer: How large tiles are
-
-// character start (0,0)
-let cx = 0;
-let cy = 0;
-let dir = 0;
-
-let sx = 0;
-let sy = 0;
-
-let mouse_down = 0;
-
-const tilesheet = new Image();
-tilesheet.src = "static/tilesheet.png";
-
-const charsheet = new Image();
-charsheet.src = "static/charsheet.png";
-
-let map = [];
-
-/* MAP OPTIONS */
-let tiles = {};
-let all_users = {};
-
-/* DRAWING */
-ctx.font = "11pt Verdana";
-ctx.textAlign = "end";
-const w = canvas.clientWidth;
-const h = canvas.clientHeight - 20;
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let x = 0; x < w; x += tile_buffer) {
-    const curr_x = x/tile_buffer+(cx-sx);
-    for (let y = 0; y < h; y += tile_buffer) {
-      const tile = map[y/tile_buffer+(cy-sy)][curr_x];
-      if (Array.isArray(tile)) {
-        for (const def in tile) {
-          drawTile(tile[def], x, y);
-        }
-      }
-      else {
-        drawTile(tile, x, y);
-      }
-    }
-  }
-
-  drawOthers();
-
-  // Fill the local character tile
-  if (charsheet.complete) {
-    drawPlayer(sx, sy, dir);
-  }
-  else {
-    charsheet.addEventListener('load', drawPlayer);
-  }
-
-  // Fill the position
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
-  ctx.strokeText(
-    "(" + cx + ", " + cy + ")",
-    14*tile_buffer+30, 15*tile_buffer+15
-  );
-}
-
-function drawTile(tile, x, y) {
-  ctx.beginPath();
-  if (tilesheet.complete) {
-    drawImage(tile, x, y);
-  }
-  else {
-    tilesheet.load = drawImage.bind(tile, x, y);
-  }
-  ctx.moveTo(x, y);
-  ctx.lineTo(x + tile_buffer, y);
-  ctx.moveTo(x, y);
-  ctx.lineTo(x, y + tile_buffer);
-  ctx.stroke();
-  ctx.closePath();
-}
-
-function drawPlayer(x_, y_, direction) {
-  ctx.strokeStyle = "transparent";
-  ctx.drawImage(charsheet, direction * tile_buffer, 0,
-    tile_buffer, tile_buffer, x_*tile_buffer, y_*tile_buffer, tile_buffer, tile_buffer)
-}
-
-function drawImage(tile, x, y) {
-  ctx.strokeStyle = "transparent";
-  ctx.drawImage(tilesheet, (tile % 10) * tile_buffer, Math.floor(tile / 10) * tile_buffer,
-    tile_buffer, tile_buffer, x, y, tile_buffer, tile_buffer);
-}
-
-function drawOthers() {
-  for (const u in all_users) {
-    if (u != user) {
-      const ucx = all_users[u]['cx'];
-      const ucy = all_users[u]['cy'];
-      const x = ucx - cx;
-      const y = ucy - cy;
-      if (x >= -sx && x <= sx && y >= -sy && y <= sy) {
-        // Fill the character tile
-        drawPlayer(x+sx, y+sy, all_users[u]['direction'])
-      }
-    }
-  }
-}
-
-
-/* MOVEMENT */
-function sendAction(e) {
-  if (![
-    32, 37, 38, 39, 40, 65, 68, 69, 83, 87
-  ].includes(e.keyCode)) return;
-  e.preventDefault();
-
-  if (e.keyCode == 32) { // Spacebar
-    console.log("Eventually we will implement the spacebar for interacting"
-      + " with items below your character.");
-  }
-
-  else if (e.keyCode == 69) {
-    console.log("Eventually we will implement the 'e' key for interacting"
-      + " with nearby npcs and objects, if your player is facing them!");
-  }
-
-  socket.emit('json', JSON.stringify({
-    'user': user,
-    'action': e.keyCode,
-  }))
-}
 
 function determineClick(click_x, click_y) {
   const mid_offset = 15;
@@ -202,15 +74,8 @@ function polygon_click_test( nvert, vertx, verty, testx, testy ) {
     return c;
 }
 
-function doMove(movement) {
-  cx = movement['cx'];
-  cy = movement['cy'];
-  dir = movement['direction'];
-}
-
 function getClickCoords(e) {
   e.preventDefault();
-  mouse_down = 1;
   const click_x = e.offsetX;
   const click_y = e.offsetY;
   determineClick(click_x, click_y);
@@ -218,20 +83,48 @@ function getClickCoords(e) {
 
 function getTouchCoords(e) {
   e.preventDefault();
-  mouse_down = 2;
   const click_x = e.touches[0].clientX - canvas.getBoundingClientRect().left;
   const click_y = e.touches[0].clientY - canvas.getBoundingClientRect().top;
   determineClick(click_x, click_y);
 }
 
-function listener() {
+export function listener() {
   document.addEventListener('keydown', sendAction);
 }
 
-function clickListener() {
+export function clickListener() {
   canvas.addEventListener('mousedown', getClickCoords);
   canvas.addEventListener('touchstart', getTouchCoords);
-  mouse_down = 0;
+  canvas.addEventListener('touchend', function(e){e.preventDefault()});
+}
+
+/* MOVEMENT */
+function sendAction(e) {
+  if (![
+    32, 37, 38, 39, 40, 65, 68, 69, 83, 87
+  ].includes(e.keyCode)) return;
+  e.preventDefault();
+
+  if (e.keyCode == 32) { // Spacebar
+    console.log("Eventually we will implement the spacebar for interacting"
+      + " with items below your character.");
+  }
+
+  else if (e.keyCode == 69) {
+    console.log("Eventually we will implement the 'e' key for interacting"
+      + " with nearby npcs and objects, if your player is facing them!");
+  }
+
+  socket.emit('json', JSON.stringify({
+    'user': user,
+    'action': e.keyCode,
+  }))
+}
+
+function doMove(movement) {
+  cx = movement['cx'];
+  cy = movement['cy'];
+  dir = movement['direction'];
 }
 
 let last;
