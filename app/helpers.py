@@ -38,5 +38,5 @@ def is_input_bad(action, owner):
 def handle_pickup(owner): # TODO
   cx = curr_cx = owner.get('cx')
   cy = curr_cy = owner.get('cy')
-  owner_id = owner.get('id')
+  owner_id = owner.get('username')
   return [cx, cy, owner_id]

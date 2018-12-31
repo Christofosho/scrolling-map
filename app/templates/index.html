@@ -9,9 +9,18 @@
   <meta name="viewport" content="width=device-width,user-scalable=no">
 </head>
 <body>
-  <h1>Scrolling Map</h1>
-  <p class="help">WASD, Arrows, or click to move.</p>
-  <canvas id="canvas" width="450" height="470"></canvas>
+  <h1 class="centered">Scrolling Map</h1>
+  <p id="message" class="centered show"></p>
+  <main class="hide">
+    <p class="centered help">WASD, Arrows, or click to move.</p>
+    <canvas id="canvas" width="450" height="470" class="centered"></canvas>
+  </main>
+  <div id="auth" class="centered show">
+    <form id="authentication" action="">
+      <label for="username">Username:<input type="text" id="username"></label>
+      <input type="submit" value="Enter">
+    </form>
+  </div>
   <script src="static/socket.io.js"></script>
   <script src="static/bundle.js"></script>
 </body>

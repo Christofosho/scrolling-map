@@ -1,16 +1,25 @@
-h1 {
-  margin: 0 auto;
+body {
   font: 20pt Arial;
   text-align: center;
 }
 
-#canvas {
-  display: block;
-  margin: 0 auto;
+h1 {
+  text-align: center;
 }
 
 .help {
-  margin: 5px auto;
   text-align: center;
   font-family: arial;
+}
+
+.centered {
+  margin: 0 auto;
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
 }

@@ -22,15 +22,12 @@ if (window.innerWidth < 500) {
 }
 
 /* DRAWING */
-ctx.font = "11pt Verdana";
-ctx.textAlign = "end";
-const w = canvas.clientWidth;
-const h = canvas.clientHeight - 20;
 export function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let x = 0; x < w; x += tile_buffer) {
+  const canvas_height = canvas.height - 20;
+  ctx.clearRect(0, 0, canvas.width, canvas_height);
+  for (let x = 0; x < canvas.width; x += tile_buffer) {
     const curr_x = x/tile_buffer+(cx-sx);
-    for (let y = 0; y < h; y += tile_buffer) {
+    for (let y = 0; y < canvas_height; y += tile_buffer) {
       const tile = map[y/tile_buffer+(cy-sy)][curr_x];
       if (Array.isArray(tile)) {
         for (const def in tile) {
@@ -55,10 +52,11 @@ export function draw() {
 
   // Fill the position
   ctx.fillStyle = "white";
-  ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+  ctx.strokeStyle = "black";
+  ctx.fillRect(0, canvas_height, canvas.width, 20);
   ctx.strokeText(
     "(" + cx + ", " + cy + ")",
-    14*tile_buffer+30, 15*tile_buffer+15
+    canvas.width - 40, canvas_height + 10
   );
 }
 

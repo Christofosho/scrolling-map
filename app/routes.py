@@ -10,11 +10,17 @@ def index():
 
 @socketio.on('connect')
 def connect():
-  handler.handle_connect(socketio, request)
+  pass
+  # handler.handle_connect(socketio, request)
 
 @socketio.on('disconnect')
 def disconnect():
   handler.handle_disconnect(socketio, request)
+
+@socketio.on('authentication')
+def authenticate(data):
+  data = json.loads(data)
+  authenticator.register_username(socketio, request, data.get('username'))
 
 @socketio.on('json')
 def action(data):

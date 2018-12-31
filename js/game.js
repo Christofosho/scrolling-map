@@ -6,7 +6,7 @@ import {canvas, draw} from './draw';
 /* Initializing */
 const socket = io.connect('//' + document.domain + ':' + location.port);
 
-export let user = 0;
+export let user = "";
 export let all_users = {};
 
 // character start (0,0)
@@ -143,9 +143,62 @@ let last;
   }
 
   socket.on('connect', function() {
-    listener(); // Begin movement listeners
-    clickListener();
+    const form = document.getElementById("authentication");
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      socket.emit('authentication', JSON.stringify({
+        'username': document.getElementById('username').value
+      }));
+    });
   });
+
+  socket.on('authenticated', function(data) {
+    data = JSON.parse(data);
+    const msg = document.getElementById("message");
+    if (data.success) {
+      msg.innerHTML = "Authenticated successfully!";
+      setTimeout(function() {
+        msg.innerHTML = "Loading data...";
+        loadMap(0);
+      }, 1000);
+    }
+    else {
+      msg.innerHTML = "Authentication failed. Please try again.";
+    }
+  });
+
+  async function loadMap(attempts) {
+    const loaded = await checkDataAcquired();
+    const msg = document.getElementById("message");
+    if (loaded) {
+      return setTimeout(function() {
+        document.getElementById('auth').className = "hide";
+        document.querySelector('main').className = "show";
+        msg.innerHTML = "Welcome to the world.";
+        main(); // Start the cycle
+        listener(); // Begin movement listeners
+        clickListener();
+      }, 1000);
+    }
+    attempts++;
+    if (attempts < 100) {
+      return setTimeout(function(){
+        loadMap(attempts);
+      }, 100);
+    }
+
+    msg.innerHTML = "Failed to get data from the server.";
+    return;
+  }
+
+  function checkDataAcquired() {
+    return new Promise((resolve) => {
+      const got_user = user != "";
+      const got_map = map !== undefined || map.length > 0;
+      if (got_user && got_map) return resolve(true);
+      return resolve(false);
+    });
+  }
 
   // Recieves and populates initial data.
   socket.on('init_data', function (data) {
@@ -164,7 +217,6 @@ let last;
       sx = data[3][1];
       sy = data[3][2];
     }
-    main(); // Start the cycle
   });
 
   socket.on('tiles', function (data) {
@@ -179,7 +231,7 @@ let last;
   // Moves the local player
   socket.on('movement_self', function (data) {
     data = JSON.parse(data);
-    if (user == data['user'])
+    if (user == data['username'])
       doMove(data);
   });
 

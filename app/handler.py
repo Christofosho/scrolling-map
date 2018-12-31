@@ -24,10 +24,13 @@ from app import sender
   Out:
     None
 """
-def handle_connect(socket, request):
-  user = request.sid
-  users[user] = {
-    'id': user,
+def handle_connect(socket, request, username, authenticated):
+  if not authenticated:
+    return sender.user_authenticated(request, username, authenticated)
+
+  users[username] = {
+    'username': username,
+    'current_sid': request.sid,
     'mapId': 'large',
     'cx': DEFAULT_X,
     'cy': DEFAULT_Y,
@@ -37,21 +40,21 @@ def handle_connect(socket, request):
   }
 
   data = [
-    user,
+    username,
     [DEFAULT_X, DEFAULT_Y, 0],
-    MAPS[users[user].get('mapId')],
+    MAPS[users[username].get('mapId')],
     [TILE_BUFFER, DEFAULT_X, DEFAULT_Y]
   ]
 
-  print ("User " + user + " has connected.")
+  print ("User " + username + " has connected.")
 
   sender.send_initialize_player(request, data)
-  sender.send_tile_data(socket, TILES)
+  sender.send_tile_data(socket, request, TILES)
   sender.update_all_players(socket, users)
+  sender.user_authenticated(request, username, True)
 
 
-
-""" distribute(socket, request, data, owner)
+""" distribute(socket, request, data)
 
   Handles user input, calling a function based on the input
   and sending an update to the client(s) based on the result.
@@ -59,8 +62,7 @@ def handle_connect(socket, request):
   In:
     socket: obj (socket object),
     request: obj (request object),
-    owner: dict (sender that is performing the action),
-    action: int (action being performed)
+    data: dict (information being sent),
 
 """
 def distribute(socket, request, data):
@@ -102,6 +104,7 @@ def distribute(socket, request, data):
 
 """
 def handle_disconnect(socket, request):
+  u = [u['username'] for u in users.values() if u['current_sid'] == request.sid].pop(0)
   users.pop(request.sid, 0)
-  print ("User " + request.sid + " has disconnected.")
+  print ("User " + u + " has disconnected.")
   sender.update_all_players(socket, users)

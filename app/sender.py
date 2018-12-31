@@ -5,6 +5,9 @@ from flask_socketio import emit
 
 import json
 
+def user_authenticated(request, username, authenticated):
+  emit('authenticated', json.dumps({'success': authenticated}), room=request.sid)
+
 """ send_initialize_player(request, data)
 
   In:
@@ -22,8 +25,8 @@ def send_initialize_player(request, data):
     tiles: dict (tile definition set)
 
 """
-def send_tile_data(socket, tiles):
-  socket.emit('tiles', json.dumps(tiles))
+def send_tile_data(socket, request, tiles):
+  socket.emit('tiles', json.dumps(tiles), room=request.sid)
 
 """ update_all_players(socket, users_data)
 
@@ -54,7 +57,7 @@ def send_map_data(socket, map_data):
 """
 def send_movement(request, owner):
   emit('movement_self', json.dumps({
-    'user': owner['id'],
+    'username': owner['username'],
     'cx': owner['cx'],
     'cy': owner['cy'],
     'direction': owner['direction']
