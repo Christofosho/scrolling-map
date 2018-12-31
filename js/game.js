@@ -1,5 +1,7 @@
 // game.js
 
+// import '@babel/polyfill';
+
 /* Initializing */
 const socket = io.connect('//' + document.domain + ':' + location.port);
 
