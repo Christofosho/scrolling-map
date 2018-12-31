@@ -137,8 +137,6 @@ function sendAction(e) {
   ].includes(e.keyCode)) return;
   e.preventDefault();
 
-  listener(); // Reset key listener.
-
   if (e.keyCode == 32) { // Spacebar
     console.log("Eventually we will implement the spacebar for interacting"
       + " with items below your character.");
@@ -216,7 +214,6 @@ function getClickCoords(e) {
   const click_x = e.offsetX;
   const click_y = e.offsetY;
   determineClick(click_x, click_y);
-  window.addEventListener('mouseup', clickListener);
 }
 
 function getTouchCoords(e) {
@@ -225,25 +222,16 @@ function getTouchCoords(e) {
   const click_x = e.touches[0].clientX - canvas.getBoundingClientRect().left;
   const click_y = e.touches[0].clientY - canvas.getBoundingClientRect().top;
   determineClick(click_x, click_y);
-  window.addEventListener('touchend', clickListener);
 }
 
 function listener() {
-  document.removeEventListener('keydown', sendAction);
   document.addEventListener('keydown', sendAction);
 }
 
-function clickListener(e) {
-  if (e) {
-    e.preventDefault();
-  }
-  mouse_down = 0;
-  canvas.removeEventListener('mousedown', getClickCoords);
-  canvas.removeEventListener('touchstart', getTouchCoords);
-  window.removeEventListener('mouseup', clickListener);
-  window.removeEventListener('touchend', clickListener);
+function clickListener() {
   canvas.addEventListener('mousedown', getClickCoords);
   canvas.addEventListener('touchstart', getTouchCoords);
+  mouse_down = 0;
 }
 
 let last;
