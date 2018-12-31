@@ -31,6 +31,8 @@ let dir = 0;
 let sx = 0;
 let sy = 0;
 
+let mouse_down = 0;
+
 const tilesheet = new Image();
 tilesheet.src = "static/tilesheet.png";
 
@@ -135,8 +137,7 @@ function sendAction(e) {
   ].includes(e.keyCode)) return;
   e.preventDefault();
 
-  listener(); // Reset listeners.
-  clickListener();
+  listener(); // Reset key listener.
 
   if (e.keyCode == 32) { // Spacebar
     console.log("Eventually we will implement the spacebar for interacting"
@@ -154,10 +155,7 @@ function sendAction(e) {
   }))
 }
 
-function determineClick(e) {
-  const click_x = e.offsetX;
-  const click_y = e.offsetY;
-
+function determineClick(click_x, click_y) {
   const mid_offset = 15;
   const mid_low = mid_width - mid_offset;
   const mid_high = mid_width - mid_offset;
@@ -187,9 +185,6 @@ function determineClick(e) {
     click_x, click_y)) {
     sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Right
   }
-
-  canvas.addEventListener('mouseup', clickListener);
-  canvas.addEventListener('touchend', clickListener);
 }
 
 // polygon_click_test by Wm. Randolph Franklin
@@ -215,18 +210,40 @@ function doMove(movement) {
   dir = movement['direction'];
 }
 
+function getClickCoords(e) {
+  e.preventDefault();
+  mouse_down = 1;
+  const click_x = e.offsetX;
+  const click_y = e.offsetY;
+  determineClick(click_x, click_y);
+  window.addEventListener('mouseup', clickListener);
+}
+
+function getTouchCoords(e) {
+  e.preventDefault();
+  mouse_down = 2;
+  const click_x = e.touches[0].clientX - canvas.getBoundingClientRect().left;
+  const click_y = e.touches[0].clientY - canvas.getBoundingClientRect().top;
+  determineClick(click_x, click_y);
+  window.addEventListener('touchend', clickListener);
+}
+
 function listener() {
   document.removeEventListener('keydown', sendAction);
   document.addEventListener('keydown', sendAction);
 }
 
-function clickListener() {
-  canvas.removeEventListener('mousedown', determineClick);
-  canvas.removeEventListener('touchstart', determineClick);
-  canvas.removeEventListener('mouseup', clickListener);
-  canvas.removeEventListener('touchend', clickListener);
-  canvas.addEventListener('mousedown', determineClick);
-  canvas.addEventListener('touchstart', determineClick);
+function clickListener(e) {
+  if (e) {
+    e.preventDefault();
+  }
+  mouse_down = 0;
+  canvas.removeEventListener('mousedown', getClickCoords);
+  canvas.removeEventListener('touchstart', getTouchCoords);
+  window.removeEventListener('mouseup', clickListener);
+  window.removeEventListener('touchend', clickListener);
+  canvas.addEventListener('mousedown', getClickCoords);
+  canvas.addEventListener('touchstart', getTouchCoords);
 }
 
 let last;
