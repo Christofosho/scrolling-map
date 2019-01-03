@@ -19,11 +19,11 @@ from app.constants import *
 def move_self(user, direction):
   cx = curr_cx = user.get('cx')
   cy = curr_cy = user.get('cy')
-  map_data = MAPS.get(user.get('mapId'))
-  curr_map = map_data['map']
+  map_data = MAPS.get(user.get('map_id'))
+  curr_map = map_data.get('map')
   ex = len(curr_map[0]) - DEFAULT_X
   ey = len(curr_map) - DEFAULT_Y
-  tile_options = map_data['tile_options']
+  tile_options = map_data.get('tile_options')
 
   cx, cy = check_direction(direction, cx, cy, ex, ey)
   tile = curr_map[cy][cx]

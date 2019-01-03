@@ -23,22 +23,24 @@ def disconnect():
 @socketio.on('authentication')
 def authenticate(data):
   data = json.loads(data)
-  username = data.get('username', None)
-  if username:
-    clean = authenticator.sanitize_username(username)
-    if clean:
-      return authenticator.register_username(socketio, request, handler, username)
+  clean = authenticator.sanitize_username(data)
+  if clean:
+    return authenticator.register_username(
+      socketio, request, handler, data.get('username')
+    )
 
   handler.handle_connect(socketio, request, username, False)
 
 @socketio.on('json')
 def action(data):
   data = json.loads(data)
+  clean = authenticator.sanitize_username(data)
+  if clean:
+    valid = authenticator.validate_session(request, handler, data)
+    if not valid:
+      print("Redundant login for %s" % data.get('username', 'UNKNOWN_USER'))
+      return disconnect()
 
-  if not authenticator.already_active(request, handler, data):
-    print("Redundant login for %s" % data.get('username', 'UNKNOWN_USER'))
-    return disconnect()
-
-  handler.distribute(socketio, request, data)
+    handler.distribute(socketio, request, data)
 
 a.secret_key = 'fake'

@@ -44,7 +44,7 @@ export function draw() {
 
   // Fill the local character tile
   if (charsheet.complete) {
-    drawPlayer(sx, sy, dir);
+    drawPlayer(sx, sy, dir, user);
   }
   else {
     charsheet.addEventListener('load', drawPlayer);
@@ -76,10 +76,16 @@ function drawTile(tile, x, y) {
   ctx.closePath();
 }
 
-function drawPlayer(x_, y_, direction) {
+function drawPlayer(x_, y_, direction, username) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(charsheet, direction * tile_buffer, 0,
     tile_buffer, tile_buffer, x_*tile_buffer, y_*tile_buffer, tile_buffer, tile_buffer)
+
+  ctx.fillStyle = "black";
+  ctx.font = "10pt Arial";
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  ctx.fillText(username, x_*tile_buffer + (tile_buffer / 2), y_*tile_buffer - 2);
 }
 
 function drawImage(tile, x, y) {
@@ -97,7 +103,7 @@ function drawOthers() {
       const y = ucy - cy;
       if (x >= -sx && x <= sx && y >= -sy && y <= sy) {
         // Fill the character tile
-        drawPlayer(x+sx, y+sy, all_users[u]['direction'])
+        drawPlayer(x+sx, y+sy, all_users[u]['direction'], all_users[u]['username'])
       }
     }
   }

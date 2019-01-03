@@ -13,7 +13,12 @@ from app import sender
   Out:
     bool (is username clean?)
 """
-def sanitize_username(username):
+def sanitize_username(data):
+  username = data.get('username', None)
+
+  # Username was input
+  if not username:
+    return False
 
   # Max Length 16
   if len(username) > 16:
@@ -41,7 +46,7 @@ def register_username(socket, request, handler, username):
   handler.handle_connect(socket, request, username, True)
 
 
-""" already_active(request)
+""" validate_session(request)
 
   Determines if the user is already logged in.
 
@@ -52,8 +57,8 @@ def register_username(socket, request, handler, username):
   Out:
     bool
 """
-def already_active(request, handler, data):
-  owner = handler.users.get(data.get('user'))
-  if not owner or (owner.get('current_sid') != request.sid):
-    return False
-  return True
+def validate_session(request, handler, data):
+  owner = handler.users.get(data.get('username'))
+  if owner and (owner.get('current_sid', None) == request.sid):
+    return True
+  return False

@@ -32,24 +32,24 @@ class Handler:
     user = database.retrieve_user(username)
     last_action = int(time.time() * 1000) # Milliseconds
 
-    if (user is None): # TODO: Move to DB handling file.
-      database.insert_user(username, last_action)
+    if (user is None):
+      user = database.insert_user(username, last_action)
 
     self.users[username] = {
       'username': username,
       'current_sid': request.sid,
-      'mapId': constants.DEFAULT_MAP,
-      'cx': constants.DEFAULT_X,
-      'cy': constants.DEFAULT_Y,
+      'map_id': user.map_id,
+      'cx': user.x,
+      'cy': user.y,
       'direction': 0,
       'bag': [],
-      'lastAction': last_action
+      'last_action': last_action
     }
 
     data = [
       username,
-      [constants.DEFAULT_X, constants.DEFAULT_Y, 0],
-      MAPS[self.users.get(username).get('mapId')],
+      [user.x, user.y, 0],
+      MAPS[user.map_id],
       [constants.TILE_BUFFER, constants.DEFAULT_X, constants.DEFAULT_Y]
     ]
 
@@ -76,7 +76,7 @@ class Handler:
     action_occurred = False
 
     action = data.get('action')
-    owner = self.users.get(data.get('user'))
+    owner = self.users.get(data.get('username'))
 
     if helpers.is_action_bad(action, owner):
       return
@@ -97,7 +97,7 @@ class Handler:
       sender.update_all_players(socket, self.users)
 
     if action_occurred:
-      owner['lastAction'] = int(time.time() * 1000) # Milliseconds
+      owner['last_action'] = int(time.time() * 1000) # Milliseconds
 
 
   """ handle_disconnect(socket, request)
@@ -116,6 +116,7 @@ class Handler:
                     if u['current_sid'] == request.sid}
     if request.sid in uname_to_sid.keys():
       u = uname_to_sid.get(request.sid)
+      database.save_user(self.users.get(u))
       del self.users[u]
       print ("User " + u + " has disconnected.")
     sender.update_all_players(socket, self.users)

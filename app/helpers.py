@@ -16,8 +16,8 @@ from app.constants import codes, MOVEMENTS
 def is_action_bad(action, owner):
   bad_input = action not in codes
   action_time = int(time.time() * 1000) # Milliseconds
-  bad_movement = (action in MOVEMENTS and (action_time - owner.get('lastAction') < 300))
-  bad_action = (action not in MOVEMENTS and (action_time - owner.get('lastAction') < 600))
+  bad_movement = (action in MOVEMENTS and (action_time - owner.get('last_action') < 300))
+  bad_action = (action not in MOVEMENTS and (action_time - owner.get('last_action') < 600))
 
   bad = bad_input or bad_action or bad_movement
   if bad:
