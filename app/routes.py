@@ -29,7 +29,7 @@ def authenticate(data):
       socketio, request, handler, data.get('username')
     )
 
-  handler.handle_connect(socketio, request, username, False)
+  handler.handle_connect(socketio, request, data.get('username'), False)
 
 @socketio.on('json')
 def action(data):
