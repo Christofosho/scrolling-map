@@ -3,6 +3,27 @@
 
 from app import sender
 
+""" sanitize_username(username)
+
+  Ensures entered username is only letters.
+
+  In:
+    username: str (username of the connecting user)
+
+  Out:
+    bool (is username clean?)
+"""
+def sanitize_username(username):
+
+  # Max Length 16
+  if len(username) > 16:
+    return False
+
+  if not(username.isalpha()):
+    return False
+
+  return True
+
 """ register_username(socket, request, handler, username)
 
   In:

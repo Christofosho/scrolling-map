@@ -23,7 +23,13 @@ def disconnect():
 @socketio.on('authentication')
 def authenticate(data):
   data = json.loads(data)
-  authenticator.register_username(socketio, request, handler, data.get('username'))
+  username = data.get('username', None)
+  if username:
+    clean = authenticator.sanitize_username(username)
+    if clean:
+      return authenticator.register_username(socketio, request, handler, username)
+
+  handler.handle_connect(socketio, request, username, False)
 
 @socketio.on('json')
 def action(data):
