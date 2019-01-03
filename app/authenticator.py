@@ -1,24 +1,28 @@
 ### authenticator.py
 # Manages authentication and confirmation of users.
 
-from app.constants import users
-from app import sender, handler
+from app import sender
 
-""" register_username(username)
+""" register_username(socket, request, handler, username)
 
   In:
+    socket: obj (socket object),
+    request: obj (request object),
+    handler: obj (handler object)
     username: str (username to register)
 
 """
-def register_username(socket, request, username):
-  if users.get(username):
-    # User already exists.
+def register_username(socket, request, handler, username):
+  if handler.users.get(username):
+    # User already logged in.
     return handler.handle_connect(socket, request, username, False)
 
   handler.handle_connect(socket, request, username, True)
 
 
-""" check_exists(request)
+""" already_active(request)
+
+  Determines if the user is already logged in.
 
   In:
     request: obj (request object),
@@ -27,8 +31,8 @@ def register_username(socket, request, username):
   Out:
     bool
 """
-def check_exists(request, data):
-  owner = users.get(data.get('user'))
+def already_active(request, handler, data):
+  owner = handler.users.get(data.get('user'))
   if not owner or (owner.get('current_sid') != request.sid):
     return False
   return True

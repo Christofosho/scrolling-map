@@ -2,7 +2,10 @@ from flask import request, render_template
 
 import json
 
-from app import a, authenticator, handler, socketio
+from app import a, authenticator, socketio
+from app.handler import Handler
+
+handler = Handler()
 
 @a.route("/", methods=['GET'])
 def index():
@@ -20,13 +23,14 @@ def disconnect():
 @socketio.on('authentication')
 def authenticate(data):
   data = json.loads(data)
-  authenticator.register_username(socketio, request, data.get('username'))
+  authenticator.register_username(socketio, request, handler, data.get('username'))
 
 @socketio.on('json')
 def action(data):
   data = json.loads(data)
 
-  if not authenticator.check_exists(request, data):
+  if not authenticator.already_active(request, handler, data):
+    print("Redundant login for %s" % data.get('username', 'UNKNOWN_USER'))
     return disconnect()
 
   handler.distribute(socketio, request, data)

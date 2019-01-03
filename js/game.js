@@ -116,7 +116,7 @@ function sendAction(e) {
   }
 
   socket.emit('json', JSON.stringify({
-    'user': user,
+    'username': user,
     'action': e.keyCode,
   }))
 }

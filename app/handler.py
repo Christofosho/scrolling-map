@@ -3,108 +3,119 @@
 
 import time
 
-from app.constants import DEFAULT_X, DEFAULT_Y, SPACEBAR, TILE_BUFFER
-from app.constants import DIRECTION_OFFSETS, MOVEMENTS, users
-from app.definitions import MAPS, TILES
-from app.helpers import is_input_bad, handle_pickup
-from app.movement import move_self
-
-from app import sender
+from app.definitions import *
+from app import constants, database, helpers, movement, sender
 
 
-""" handle_connect(socket, request)
+class Handler:
 
-  Initializes new users in the users dictionary. Provides
-  an updates user list to all users.
-
-  In:
-    socket: obj (socket object),
-    request: obj (request object)
-
-  Out:
-    None
-"""
-def handle_connect(socket, request, username, authenticated):
-  if not authenticated:
-    return sender.user_authenticated(request, username, authenticated)
-
-  users[username] = {
-    'username': username,
-    'current_sid': request.sid,
-    'mapId': 'large',
-    'cx': DEFAULT_X,
-    'cy': DEFAULT_Y,
-    'direction': 0,
-    'bag': [],
-    'lastAction': int(time.time() * 1000) # Milliseconds
-  }
-
-  data = [
-    username,
-    [DEFAULT_X, DEFAULT_Y, 0],
-    MAPS[users[username].get('mapId')],
-    [TILE_BUFFER, DEFAULT_X, DEFAULT_Y]
-  ]
-
-  print ("User " + username + " has connected.")
-
-  sender.send_initialize_player(request, data)
-  sender.send_tile_data(socket, request, TILES)
-  sender.update_all_players(socket, users)
-  sender.user_authenticated(request, username, True)
+  # Not actually constant - TODO later.
+  users = {}
 
 
-""" distribute(socket, request, data)
+  """ handle_connect(socket, request)
 
-  Handles user input, calling a function based on the input
-  and sending an update to the client(s) based on the result.
+    Initializes new users in the users dictionary. Provides
+    an updates user list to all users.
 
-  In:
-    socket: obj (socket object),
-    request: obj (request object),
-    data: dict (information being sent),
+    In:
+      socket: obj (socket object),
+      request: obj (request object)
 
-"""
-def distribute(socket, request, data):
-  action_occurred = False
+    Out:
+      None
+  """
+  def handle_connect(self, socket, request, username, authenticated):
+    if not authenticated:
+      return sender.user_authenticated(request, username, authenticated)
 
-  action = data.get('action')
-  owner = users.get(data.get('user'))
+    user = database.retrieve_user(username)
+    last_action = int(time.time() * 1000) # Milliseconds
 
-  if is_input_bad(action, owner):
-    return
+    if (user is None): # TODO: Move to DB handling file.
+      database.insert_user(username, last_action)
 
-  if action == SPACEBAR:
-    sender.send_map_data(socket, handle_pickup(owner))
-    action_occurred = True
+    self.users[username] = {
+      'username': username,
+      'current_sid': request.sid,
+      'mapId': constants.DEFAULT_MAP,
+      'cx': constants.DEFAULT_X,
+      'cy': constants.DEFAULT_Y,
+      'direction': 0,
+      'bag': [],
+      'lastAction': last_action
+    }
 
-  elif action in MOVEMENTS:
-    moved, cx, cy = move_self(owner, action)
-    owner['direction'] = DIRECTION_OFFSETS[action]
-    if moved:
-      owner['cx'] = cx
-      owner['cy'] = cy
+    data = [
+      username,
+      [constants.DEFAULT_X, constants.DEFAULT_Y, 0],
+      MAPS[self.users.get(username).get('mapId')],
+      [constants.TILE_BUFFER, constants.DEFAULT_X, constants.DEFAULT_Y]
+    ]
+
+    print ("User " + username + " has connected.")
+
+    sender.send_initialize_player(request, data)
+    sender.send_tile_data(socket, request, TILES)
+    sender.update_all_players(socket, self.users)
+    sender.user_authenticated(request, username, True)
+
+
+  """ distribute(socket, request, data)
+
+    Handles user input, calling a function based on the input
+    and sending an update to the client(s) based on the result.
+
+    In:
+      socket: obj (socket object),
+      request: obj (request object),
+      data: dict (information being sent),
+
+  """
+  def distribute(self, socket, request, data):
+    action_occurred = False
+
+    action = data.get('action')
+    owner = self.users.get(data.get('user'))
+
+    if helpers.is_action_bad(action, owner):
+      return
+
+    if action == constants.SPACEBAR:
+      sender.send_map_data(socket, handle_pickup(owner))
       action_occurred = True
 
-    sender.send_movement(request, owner)
-    sender.update_all_players(socket, users)
+    elif action in constants.MOVEMENTS:
+      moved, cx, cy = movement.move_self(owner, action)
+      owner['direction'] = constants.DIRECTION_OFFSETS[action]
+      if moved:
+        owner['cx'] = cx
+        owner['cy'] = cy
+        action_occurred = True
 
-  if action_occurred:
-    owner['lastAction'] = int(time.time() * 1000) # Milliseconds
+      sender.send_movement(request, owner)
+      sender.update_all_players(socket, self.users)
+
+    if action_occurred:
+      owner['lastAction'] = int(time.time() * 1000) # Milliseconds
 
 
-""" handle_disconnect(socket, request)
+  """ handle_disconnect(socket, request)
 
-  Removes a user from the list and updates
-  all users with the new user list.
+    Removes a user from the list and updates
+    all users with the new user list.
 
-  In:
-    socket: obj (socket object),
-    request: obj (request object)
+    In:
+      socket: obj (socket object),
+      request: obj (request object)
 
-"""
-def handle_disconnect(socket, request):
-  u = [u['username'] for u in users.values() if u['current_sid'] == request.sid].pop(0)
-  users.pop(request.sid, 0)
-  print ("User " + u + " has disconnected.")
-  sender.update_all_players(socket, users)
+  """
+  def handle_disconnect(self, socket, request):
+    uname_to_sid = {u['current_sid']: u['username']
+                    for u in self.users.values()
+                    if u['current_sid'] == request.sid}
+    if request.sid in uname_to_sid.keys():
+      u = uname_to_sid.get(request.sid)
+      del self.users[u]
+      print ("User " + u + " has disconnected.")
+    sender.update_all_players(socket, self.users)

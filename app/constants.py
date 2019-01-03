@@ -38,11 +38,7 @@ BORDER_TILES = 7 # Used to ensure user doesn't fall off the map.
 DEFAULT_X = 7
 DEFAULT_Y = 7
 TILE_BUFFER = 30
-
+DEFAULT_MAP = 'large'
 
 ## Tile Option Constants
 BLOCKING = 1
-
-
-# Not actually constant - TODO later.
-users = {}
