@@ -24,6 +24,9 @@ def sanitize_username(data):
   if len(username) > 16:
     return False
 
+  if len(username) < 3:
+    return False
+
   if not(username.isalpha()):
     return False
 
