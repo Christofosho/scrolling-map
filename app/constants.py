@@ -3,6 +3,7 @@
 
 ## Movement Constants
 SPACEBAR = 32
+E = 69
 LEFT = 37
 UP = 38
 RIGHT = 39
@@ -13,6 +14,7 @@ D = 68 # Right
 S = 83 # Down
 codes = (
   SPACEBAR,
+  E,
   LEFT, UP, RIGHT, DOWN,
   A, W, D, S
 )
@@ -21,15 +23,20 @@ MOVEMENTS = (
   A, W, D, S
 )
 
+OFFSET_DOWN = 0
+OFFSET_UP = 1
+OFFSET_RIGHT = 2
+OFFSET_LEFT = 3
+
 DIRECTION_OFFSETS = {
-  LEFT: 3,
-  UP: 1,
-  RIGHT: 2,
-  DOWN: 0,
-  A: 3, # Left
-  W: 1, # Up
-  D: 2, # Right
-  S: 0 # Down
+  LEFT: OFFSET_LEFT,
+  UP: OFFSET_UP,
+  RIGHT: OFFSET_RIGHT,
+  DOWN: OFFSET_DOWN,
+  A: OFFSET_LEFT,
+  W: OFFSET_UP,
+  D: OFFSET_RIGHT,
+  S: OFFSET_DOWN
 }
 
 

@@ -109,11 +109,6 @@ function sendAction(e) {
       + " with items below your character.");
   }
 
-  else if (e.keyCode == 69) {
-    console.log("Eventually we will implement the 'e' key for interacting"
-      + " with nearby npcs and objects, if your player is facing them!");
-  }
-
   socket.emit('json', JSON.stringify({
     'username': user,
     'action': e.keyCode,
@@ -217,6 +212,7 @@ let last;
   // Recieves and populates map data.
   socket.on('map_data', function (data) {
     data = JSON.parse(data);
+    map = data
   });
 
   // Moves the local player

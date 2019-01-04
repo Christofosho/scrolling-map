@@ -3,7 +3,8 @@
 
 import time
 
-from app import constants, database, helpers, movement, sender
+from app import constants, database, helpers
+from app import movement, objects, sender
 from app.entity.player import Player
 from app.definitions import *
 
@@ -80,9 +81,22 @@ class Handler:
     if helpers.is_action_bad(action, owner):
       return
 
+    ## Pickup items
     if action == constants.SPACEBAR:
       sender.send_map_data(socket, handle_pickup(owner))
       action_occurred = True
+
+    ## Use objects
+    elif action == constants.E:
+      obj, obj_x, obj_y = objects.check_object(
+        owner.x,
+        owner.y,
+        owner.direction,
+        owner.map_id
+      )
+
+      if obj:
+        objects.determine_interaction(socket, owner, obj, obj_x, obj_y)
 
     elif action in constants.MOVEMENTS:
       moved, cx, cy = movement.move_self(owner, action)

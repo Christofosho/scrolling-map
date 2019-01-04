@@ -18,7 +18,7 @@ def user_authenticated(request, username, authenticated):
 def send_initialize_player(request, data):
   emit('init_data', json.dumps(data), room=request.sid)
 
-""" send_tile_data(socket, tiles)
+""" send_object_action(socket, tiles)
 
   In:
     socket: obj (socket object),

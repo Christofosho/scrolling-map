@@ -28,9 +28,9 @@ def move_self(user, direction):
   cx, cy = check_direction(direction, cx, cy, ex, ey)
   tile = map_data[cy][cx]
   if (type(tile) == list):
-    blocked = any([x & BLOCKING for x in tile])
+    blocked = any([ENTITIES[x]['blocking'] & BLOCKING for x in tile])
   else:
-    blocked = tile_options[tile] & BLOCKING
+    blocked = ENTITIES[tile]['blocking'] & BLOCKING
 
   if not(blocked) and (cx != curr_cx or cy != curr_cy):
     return True, cx, cy
