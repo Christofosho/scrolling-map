@@ -11,3 +11,4 @@ db = SQLAlchemy(a)
 
 from app import routes
 from app.models import User
+from app import entity

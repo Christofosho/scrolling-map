@@ -48,13 +48,13 @@ def insert_user(username, last_action):
 """
 def save_user(user):
   try:
-    db_user = User.query.filter_by(username=user.get('username')).first()
-    db_user.x = user.get('cx')
-    db_user.y = user.get('cy')
-    db_user.map_id = user.get('map_id')
-    db_user.last_login = user.get('last_action')
+    db_user = User.query.filter_by(username=user.username).first()
+    db_user.x = user.x
+    db_user.y = user.y
+    db_user.map_id = user.map_id
+    db_user.last_login = user.last_action
     db.session.commit()
 
   except Exception as e:
-    print("Failed to save user: %s" % user.get('username'))
+    print("Failed to save user: %s" % user.username)
     print(e)

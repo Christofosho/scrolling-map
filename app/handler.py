@@ -3,15 +3,15 @@
 
 import time
 
-from app.definitions import *
 from app import constants, database, helpers, movement, sender
+from app.entity.player import Player
+from app.definitions import *
 
 
 class Handler:
 
-  # Not actually constant - TODO later.
+  # Not actually constants - TODO later.
   users = {}
-
 
   """ handle_connect(socket, request)
 
@@ -35,31 +35,30 @@ class Handler:
     if (user is None):
       user = database.insert_user(username, last_action)
 
-    self.users[username] = {
-      'username': username,
-      'current_sid': request.sid,
-      'map_id': user.map_id,
-      'cx': user.x,
-      'cy': user.y,
-      'direction': 0,
-      'bag': [],
-      'last_action': last_action
-    }
-
-    data = [
-      username,
-      [user.x, user.y, 0],
-      MAPS[user.map_id],
-      [constants.TILE_BUFFER, constants.DEFAULT_X, constants.DEFAULT_Y]
-    ]
+    self.users[username] = Player(
+      user.uid, username, user.x, user.y, user.map_id,
+      request.sid, # Store SID to track session.
+      direction=0, bag=[], last_action=last_action
+    )
 
     print ("User " + username + " has connected.")
 
-    sender.send_initialize_player(request, data)
-    sender.send_tile_data(socket, request, TILES)
     sender.update_all_players(socket, self.users)
     sender.user_authenticated(request, username, True)
 
+  """ send_init_data(username)
+
+  """
+  def send_init_data(self, request, username):
+    user = self.users.get(username, None)
+    if user:
+      data = [
+        username,
+        [user.x, user.y, 0],
+        MAPS[user.map_id],
+        [constants.TILE_BUFFER, constants.DEFAULT_X, constants.DEFAULT_Y]
+      ]
+      sender.send_initialize_player(request, data)
 
   """ distribute(socket, request, data)
 
@@ -87,17 +86,17 @@ class Handler:
 
     elif action in constants.MOVEMENTS:
       moved, cx, cy = movement.move_self(owner, action)
-      owner['direction'] = constants.DIRECTION_OFFSETS[action]
+      owner.direction = constants.DIRECTION_OFFSETS[action]
       if moved:
-        owner['cx'] = cx
-        owner['cy'] = cy
+        owner.x = cx
+        owner.y = cy
         action_occurred = True
 
       sender.send_movement(request, owner)
       sender.update_all_players(socket, self.users)
 
     if action_occurred:
-      owner['last_action'] = int(time.time() * 1000) # Milliseconds
+      owner.last_action = int(time.time() * 1000) # Milliseconds
 
 
   """ handle_disconnect(socket, request)
@@ -111,9 +110,9 @@ class Handler:
 
   """
   def handle_disconnect(self, socket, request):
-    uname_to_sid = {u['current_sid']: u['username']
+    uname_to_sid = {u.current_sid: u.username
                     for u in self.users.values()
-                    if u['current_sid'] == request.sid}
+                    if u.current_sid == request.sid}
     if request.sid in uname_to_sid.keys():
       u = uname_to_sid.get(request.sid)
       database.save_user(self.users.get(u))

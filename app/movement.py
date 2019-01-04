@@ -1,8 +1,10 @@
 ### movement.py
 # Handles movement actions.
 
-from app.definitions import MAPS
+from app.definitions import MAPS, ENTITIES
 from app.constants import *
+
+tile_options = [entity['blocking'] for entity in ENTITIES]
 
 """ move_self(user, direction)
 
@@ -17,16 +19,14 @@ from app.constants import *
     tuple(bool, int, int)
 """
 def move_self(user, direction):
-  cx = curr_cx = user.get('cx')
-  cy = curr_cy = user.get('cy')
-  map_data = MAPS.get(user.get('map_id'))
-  curr_map = map_data.get('map')
-  ex = len(curr_map[0]) - DEFAULT_X
-  ey = len(curr_map) - DEFAULT_Y
-  tile_options = map_data.get('tile_options')
+  cx = curr_cx = user.x
+  cy = curr_cy = user.y
+  map_data = MAPS.get(user.map_id)
+  ex = len(map_data[0]) - DEFAULT_X
+  ey = len(map_data) - DEFAULT_Y
 
   cx, cy = check_direction(direction, cx, cy, ex, ey)
-  tile = curr_map[cy][cx]
+  tile = map_data[cy][cx]
   if (type(tile) == list):
     blocked = any([x & BLOCKING for x in tile])
   else:

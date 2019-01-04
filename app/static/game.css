@@ -23,3 +23,7 @@ h1 {
 .hide {
   display: none;
 }
+
+#canvas {
+  padding-left: 60px;
+}

@@ -31,6 +31,15 @@ def authenticate(data):
 
   handler.handle_connect(socketio, request, data.get('username'), False)
 
+@socketio.on('retrieve_init_data')
+def retrieve_init_data(data):
+  data = json.loads(data)
+  clean = authenticator.sanitize_username(data)
+  if clean:
+    return handler.send_init_data(request, data.get('username'))
+
+  handler.handle_connect(socketio, request, data.get('username'), False)
+
 @socketio.on('json')
 def action(data):
   data = json.loads(data)

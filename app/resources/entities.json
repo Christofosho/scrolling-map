@@ -1,0 +1,40 @@
+[
+  {
+    "entity_id": 0,
+    "type": "tile",
+    "name": "water_1",
+    "blocking": 1
+  },
+  {
+    "entity_id": 1,
+    "type": "tile",
+    "name": "grass_1",
+    "blocking": 0
+  },
+  {
+    "entity_id": 2,
+    "type": "object",
+    "name": "wooden_fence_1",
+    "blocking": 1,
+    "options": ["Examine"],
+    "examine": "It's a wooden fence."
+  },
+  {
+    "entity_id": 3,
+    "type": "object",
+    "name": "wooden_gate_closed_1",
+    "related_entity_id": 4,
+    "blocking": 1,
+    "options": ["Open", "Examine"],
+    "examine": "It's a wooden gate. It can be opened."
+  },
+  {
+    "entity_id": 4,
+    "type": "object",
+    "name": "wooden_gate_open_1",
+    "related_entity_id": 3,
+    "blocking": 0,
+    "options": ["Close", "Examine"],
+    "examine": "It's a wooden gate. It can be closed."
+  }
+]

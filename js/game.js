@@ -19,14 +19,13 @@ export let sy = 0;
 
 /* MAP OPTIONS */
 export let map = [];
-export let tiles = {};
+export let action_data = {};
 export let tile_buffer = 0; // Tile Buffer: How large tiles are
-
-const mid_width = canvas.width / 2;
-const mid_height = canvas.height / 2;
 
 function determineClick(click_x, click_y) {
   const mid_offset = 15;
+  const mid_width = canvas.width / 2;
+  const mid_height = canvas.height / 2;
   const mid_low = mid_width - mid_offset;
   const mid_high = mid_width - mid_offset;
   if (polygon_click_test(4,
@@ -122,9 +121,9 @@ function sendAction(e) {
 }
 
 function doMove(movement) {
-  cx = movement['cx'];
-  cy = movement['cy'];
-  dir = movement['direction'];
+  cx = movement.cx;
+  cy = movement.cy;
+  dir = movement.direction;
 }
 
 let last;
@@ -159,19 +158,21 @@ let last;
       msg.innerHTML = "Authenticated successfully!";
       setTimeout(function() {
         msg.innerHTML = "Loading data...";
-        loadMap(0);
-      }, 1000);
+        socket.emit('retrieve_init_data', JSON.stringify({
+          'username': data.username
+        }));
+      }, 600);
     }
     else {
       msg.innerHTML = "Authentication failed. Please try again.";
     }
   });
 
-  async function loadMap(attempts) {
-    const loaded = await checkDataAcquired();
+  function loadMap(attempts) {
+    const loaded = checkDataAcquired();
     const msg = document.getElementById("message");
     if (loaded) {
-      return setTimeout(function() {
+      setTimeout(function() {
         document.getElementById('auth').className = "hide";
         document.querySelector('main').className = "show";
         msg.innerHTML = "Welcome to the world.";
@@ -179,48 +180,38 @@ let last;
         listener(); // Begin movement listeners
         clickListener();
       }, 1000);
+      return; // Do not execute the rest of the function.
     }
     attempts++;
-    if (attempts < 100) {
-      return setTimeout(function(){
+    if (attempts < 10) {
+      setTimeout(function(){
         loadMap(attempts);
       }, 100);
+      return; // Do not execute the rest of the function.
     }
 
     msg.innerHTML = "Failed to get data from the server.";
-    return;
   }
 
   function checkDataAcquired() {
-    return new Promise((resolve) => {
-      const got_user = user != "";
-      const got_map = map !== undefined || map.length > 0;
-      if (got_user && got_map) return resolve(true);
-      return resolve(false);
-    });
+    const got_user = user !== "";
+    const got_map = map !== undefined || map.length > 0;
+    return got_user && got_map;
   }
 
   // Recieves and populates initial data.
   socket.on('init_data', function (data) {
     data = JSON.parse(data);
-    user = data[0];
-    cx = data[1][0];
-    cy = data[1][1];
-    dir = data[1][2];
-    map  = data[2]['map'];
-    tile_buffer = data[3][0];
+    [user, [cx, cy, dir], map, [tile_buffer, sx, sy]] = data;
     if (canvas.width < 450) {
       sx = 4;
       sy = 4;
     }
-    else {
-      sx = data[3][1];
-      sy = data[3][2];
-    }
+    loadMap(0);
   });
 
-  socket.on('tiles', function (data) {
-    tiles = JSON.parse(data);
+  socket.on('object_action', function (data) {
+    action_data = JSON.parse(data);
   });
 
   // Recieves and populates map data.
@@ -231,7 +222,7 @@ let last;
   // Moves the local player
   socket.on('movement_self', function (data) {
     data = JSON.parse(data);
-    if (user == data['username'])
+    if (user == data.username)
       doMove(data);
   });
 

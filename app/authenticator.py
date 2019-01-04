@@ -62,6 +62,6 @@ def register_username(socket, request, handler, username):
 """
 def validate_session(request, handler, data):
   owner = handler.users.get(data.get('username'))
-  if owner and (owner.get('current_sid', None) == request.sid):
+  if owner and (owner.current_sid == request.sid):
     return True
   return False
