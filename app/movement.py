@@ -2,7 +2,7 @@
 # Handles movement actions.
 
 from app.definitions import MAPS, ENTITIES
-from app.constants import *
+from app.constants import BLOCKING, DEFAULT_X, DEFAULT_Y
 
 tile_options = [entity['blocking'] for entity in ENTITIES]
 
