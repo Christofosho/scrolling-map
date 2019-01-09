@@ -14,14 +14,14 @@
   {
     "entity_id": 2,
     "type": "object",
-    "name": "wooden_fence_1",
+    "name": "Wooden Fence",
     "blocking": 1,
     "examine": "It's a wooden fence."
   },
   {
     "entity_id": 3,
     "type": "object",
-    "name": "wooden_gate_closed_1",
+    "name": "Wooden Gate",
     "related_entity_id": 4,
     "blocking": 1,
     "interact": "replace",
@@ -30,7 +30,7 @@
   {
     "entity_id": 4,
     "type": "object",
-    "name": "wooden_gate_open_1",
+    "name": "Wooden Gate",
     "related_entity_id": 3,
     "blocking": 0,
     "interact": "replace",

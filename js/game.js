@@ -22,9 +22,23 @@ export let last_click_y = -1;
 /* MAP OPTIONS */
 export let map = [];
 export let entities = [];
-export let options = [];
 export let action_data = {};
 export let tile_buffer = 0; // Tile Buffer: How large tiles are
+
+export let examine = "";
+function resetExamine() {
+  examine = "";
+  draw.examine_menu_vertices = [
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0]
+  ];
+}
+
+export let object_name = "";
+let hover_x = -1;
+let hover_y = -1;
 
 function determineLeftClick(click_x, click_y) {
   let canvas_width = draw.canvas.width - 60;
@@ -39,107 +53,87 @@ function determineLeftClick(click_x, click_y) {
   const mid_low = mid_width - mid_offset;
   const mid_high = mid_width + mid_offset;
 
-  // Click the right-click options menu
+  resetExamine();
+
+  // Click on middle square (where player is standing)
   if (polygon_click_test(4,
-    [draw.option_menu_vertices[0][0], draw.option_menu_vertices[1][0],
-    draw.option_menu_vertices[2][0], draw.option_menu_vertices[3][0]],
-    [draw.option_menu_vertices[0][1], draw.option_menu_vertices[1][1],
-    draw.option_menu_vertices[2][1], draw.option_menu_vertices[3][1]],
+    [mid_low, mid_high, mid_high, mid_low], // x values
+    [mid_low, mid_low, mid_high, mid_high], // y values
     click_x, click_y)) {
-      handleOptionClicked(click_x, click_y);
+    sendAction({'keyCode': 32, 'preventDefault': function(){}}); // Spacebar
   }
 
-  else {
-
-    // Reset options.
-    options = [];
-    draw.option_menu_vertices = [
-      [0, 0],
-      [0, 0],
-      [0, 0],
-      [0, 0]
-    ];
-
-    // Click on middle square (where player is standing)
-    if (polygon_click_test(4,
-      [mid_low, mid_high, mid_high, mid_low], // x values
-      [mid_low, mid_low, mid_high, mid_high], // y values
-      click_x, click_y)) {
-      sendAction({'keyCode': 32, 'preventDefault': function(){}}); // Spacebar
+  // Click on square directly above player location.
+  else if (polygon_click_test(4,
+    [mid_low, mid_high, mid_high, mid_low], // x values
+    [mid_low - tile_buffer, mid_low - tile_buffer, mid_low, mid_low], // y values
+    click_x, click_y)) {
+    if (dir == 1 && containsObject(cx, cy-1)) {
+      sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
-
-    // Click on square directly above player location.
-    else if (polygon_click_test(4,
-      [mid_low, mid_high, mid_high, mid_low], // x values
-      [mid_low - tile_buffer, mid_low - tile_buffer, mid_low, mid_low], // y values
-      click_x, click_y)) {
-      if (dir == 1 && containsObject(cx, cy-1)) {
-        sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
-      }
-      else {
-        sendAction({'keyCode': 38, 'preventDefault': function(){}}); // Up
-      }
-    }
-
-    // Click on square directly below player location.
-    else if (polygon_click_test(4,
-      [mid_low, mid_low, mid_high, mid_high], // x values
-      [mid_high, mid_high + tile_buffer, mid_high + tile_buffer, mid_high], // y values
-      click_x, click_y)) {
-      if (dir == 0 && containsObject(cx, cy+1)) {
-        sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
-      }
-      else {
-        sendAction({'keyCode': 40, 'preventDefault': function(){}}); // Up
-      }
-    }
-
-    // Click on square directly left player location.
-    else if (polygon_click_test(4,
-      [mid_low - tile_buffer, mid_low, mid_low, mid_low - tile_buffer], // x values
-      [mid_low, mid_low, mid_high, mid_high], // y values
-      click_x, click_y)) {
-      if (dir == 3 && containsObject(cx-1, cy)) {
-        sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
-      }
-      else {
-        sendAction({'keyCode': 37, 'preventDefault': function(){}}); // Up
-      }
-    }
-
-    // Click on square directly right player location.
-    else if (polygon_click_test(4,
-      [mid_high, mid_high + tile_buffer, mid_high + tile_buffer, mid_high], // x values
-      [mid_low, mid_low, mid_high, mid_high], // y values
-      click_x, click_y)) {
-      if (dir == 2 && containsObject(cx+1, cy)) {
-        sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
-      }
-      else {
-        sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Up
-      }
-    }
-
-    else if (polygon_click_test(3,
-      [0, mid_width, canvas_width], [0, mid_height, 0],
-      click_x, click_y)) {
+    else {
       sendAction({'keyCode': 38, 'preventDefault': function(){}}); // Up
     }
-    else if (polygon_click_test(3,
-      [0, mid_width, canvas_width], [canvas_height, mid_height, canvas_height],
-      click_x, click_y)) {
-      sendAction({'keyCode': 40, 'preventDefault': function(){}}); // Down
+  }
+
+  // Click on square directly below player location.
+  else if (polygon_click_test(4,
+    [mid_low, mid_low, mid_high, mid_high], // x values
+    [mid_high, mid_high + tile_buffer, mid_high + tile_buffer, mid_high], // y values
+    click_x, click_y)) {
+    if (dir == 0 && containsObject(cx, cy+1)) {
+      sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
-    else if (polygon_click_test(3,
-      [0, mid_width, 0], [0, mid_height, canvas_height],
-      click_x, click_y)) {
-      sendAction({'keyCode': 37, 'preventDefault': function(){}}); // Left
+    else {
+      sendAction({'keyCode': 40, 'preventDefault': function(){}}); // Up
     }
-    else if (polygon_click_test(3,
-      [canvas_width, mid_width, canvas_width], [0, mid_height, canvas_height],
-      click_x, click_y)) {
-      sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Right
+  }
+
+  // Click on square directly left player location.
+  else if (polygon_click_test(4,
+    [mid_low - tile_buffer, mid_low, mid_low, mid_low - tile_buffer], // x values
+    [mid_low, mid_low, mid_high, mid_high], // y values
+    click_x, click_y)) {
+    if (dir == 3 && containsObject(cx-1, cy)) {
+      sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
+    else {
+      sendAction({'keyCode': 37, 'preventDefault': function(){}}); // Up
+    }
+  }
+
+  // Click on square directly right player location.
+  else if (polygon_click_test(4,
+    [mid_high, mid_high + tile_buffer, mid_high + tile_buffer, mid_high], // x values
+    [mid_low, mid_low, mid_high, mid_high], // y values
+    click_x, click_y)) {
+    if (dir == 2 && containsObject(cx+1, cy)) {
+      sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
+    }
+    else {
+      sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Up
+    }
+  }
+
+  else if (polygon_click_test(3,
+    [0, mid_width, canvas_width], [0, mid_height, 0],
+    click_x, click_y)) {
+    sendAction({'keyCode': 38, 'preventDefault': function(){}}); // Up
+  }
+  else if (polygon_click_test(3,
+    [0, mid_width, canvas_width], [canvas_height, mid_height, canvas_height],
+    click_x, click_y)) {
+    sendAction({'keyCode': 40, 'preventDefault': function(){}}); // Down
+  }
+  else if (polygon_click_test(3,
+    [0, mid_width, 0], [0, mid_height, canvas_height],
+    click_x, click_y)) {
+    sendAction({'keyCode': 37, 'preventDefault': function(){}}); // Left
+  }
+  else if (polygon_click_test(3,
+    [canvas_width, mid_width, canvas_width], [0, mid_height, canvas_height],
+    click_x, click_y)) {
+    sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Right
   }
 }
 
@@ -158,15 +152,6 @@ function polygon_click_test( nvert, vertx, verty, testx, testy ) {
         }
     }
     return c;
-}
-
-function handleOptionClicked(click_x, click_y) {
-  let omv = draw.option_menu_vertices;
-  let total_height = omv[3][1] - omv[0][1];
-  // First option clicked
-  if (Math.floor(click_y / tile_buffer) < total_height / options.length) {
-    console.log("First Item Clicked.");
-  }
 }
 
 function setTouchCoords(e) {
@@ -198,8 +183,18 @@ function getTouchCoords(e) {
 
 function setContextMenu(e) {
   e.preventDefault();
-  let click_x = Math.floor(last_click_x / 30);
-  let click_y = Math.floor(last_click_y / 30);
+  let tile = getTile(last_click_x, last_click_y);
+  if (Array.isArray(tile)) {
+    let object = entities[tile[1]];
+    if (object.type == "object") {
+      examine = object.examine;
+    }
+  }
+}
+
+function getTile(x_, y_) {
+  let click_x = Math.floor(x_ / 30);
+  let click_y = Math.floor(y_ / 30);
   let tile_x = -1;
   let tile_y = -1;
   if (sy > click_y) {
@@ -215,15 +210,40 @@ function setContextMenu(e) {
   else {
     tile_x = cx + (click_x - sx);
   }
-  
-  let tile = map[tile_y][tile_x];
-  options = [];
-  console.log(tile_y, tile_x, tile);
+
+  return map[tile_y][tile_x];
+}
+
+function handleMouseMovement(e) {
+  e.preventDefault();
+  let mouse_x = e.offsetX;
+  let mouse_y = e.offsetY;
+
+  // Mouse off right-click menu closes it (+- 5px)
+  if (!polygon_click_test(4, [
+    draw.examine_menu_vertices[0][0], draw.examine_menu_vertices[1][0],
+    draw.examine_menu_vertices[2][0], draw.examine_menu_vertices[3][0]
+  ], [
+    draw.examine_menu_vertices[0][1], draw.examine_menu_vertices[1][1],
+    draw.examine_menu_vertices[2][1], draw.examine_menu_vertices[3][1]
+  ], mouse_x, mouse_y)) {
+    resetExamine();
+  }
+
+  // Mouse over object shows text in corner
+  let tile = getTile(mouse_x, mouse_y);
   if (Array.isArray(tile)) {
     let object = entities[tile[1]];
-    if (object.type == "object") {
-      options.push("Examine");
+    if (object.type == "object" || object.type == "item") {
+      object_name = object.name;
+      hover_x = mouse_x;
+      hover_y = mouse_y;
     }
+  }
+  else {
+    object_name = "";
+    hover_x = -1;
+    hover_y = -1;
   }
 }
 
@@ -236,6 +256,7 @@ export function clickListener() {
   draw.canvas.addEventListener('touchstart', setTouchCoords);
   draw.canvas.addEventListener('touchend', getTouchCoords);
   draw.canvas.addEventListener("contextmenu", setContextMenu);
+  draw.canvas.addEventListener("mousemove", handleMouseMovement);
 }
 
 // Check if the tile at (x_, y_) has an object.

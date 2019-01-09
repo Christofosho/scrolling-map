@@ -16,7 +16,7 @@ charsheet.src = "static/charsheet.png";
 const optionsheet = new Image();
 optionsheet.src = "static/optionsheet.png";
 
-export let option_menu_vertices = [
+export let examine_menu_vertices = [
   [0, 0],
   [0, 0],
   [0, 0],
@@ -33,7 +33,7 @@ if (window.innerWidth < 500) {
 export function draw() {
   const canvas_width = canvas.width - 60;
   const canvas_height = canvas.height - 20;
-  ctx.clearRect(0, 0, canvas_width, canvas_height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let x = 0; x < canvas_width; x += game.tile_buffer) {
     const curr_x = x/game.tile_buffer+(game.cx-game.sx);
     for (let y = 0; y < canvas_height; y += game.tile_buffer) {
@@ -60,8 +60,12 @@ export function draw() {
     charsheet.addEventListener('load', drawPlayer);
   }
 
-  if (game.options.length > 0) {
-    drawRightClickOptions();
+  if (game.object_name.length > 0) {
+    drawObjectName();
+  }
+
+  if (game.examine.length > 0) {
+    drawRightClickExamine();
   }
 
   // Fill the position
@@ -148,32 +152,33 @@ function drawSidePanel() {
   );
 }
 
-function drawRightClickOptions() {
-  let longest = 0;
-  game.options.forEach(function(s) {
-    if (s.length > longest) {
-      longest = s.length;
-    }
-  });
-  let box_width = 10 * longest;
-  let box_height = 25 * game.options.length;
+function drawRightClickExamine() {
+  let len = game.examine.length;
+  let box_width = 7 * len;
+  let box_height = 25;
+
   ctx.fillStyle = "black";
-  ctx.strokeStyle = "white";
   ctx.fillRect(
     game.last_click_x,
     game.last_click_y,
     box_width, box_height
   );
-  option_menu_vertices = [
-    [game.last_click_x, game.last_click_y],
-    [game.last_click_x + box_width, game.last_click_y],
-    [game.last_click_x + box_width, game.last_click_y + box_height],
-    [game.last_click_x, game.last_click_y + box_height]
+
+  examine_menu_vertices = [
+    [game.last_click_x - 5, game.last_click_y - 5],
+    [game.last_click_x + box_width + 5, game.last_click_y - 5],
+    [game.last_click_x + box_width + 5, game.last_click_y + box_height + 5],
+    [game.last_click_x - 5, game.last_click_y + box_height + 5]
   ];
-  game.options.forEach(function(s){
-    ctx.strokeText(s,
-      game.last_click_x + Math.floor(box_width / 2),
-      game.last_click_y + Math.floor(box_height / 2)
-    );
-  });
+
+  ctx.fillStyle = "white";
+  ctx.fillText(game.examine,
+    game.last_click_x + Math.floor(box_width / 2),
+    game.last_click_y + Math.floor(box_height / 2)
+  );
+}
+
+function drawObjectName() {
+  ctx.fillStyle = "white";
+  ctx.fillText(game.object_name, canvas.width - 120, 10);
 }
