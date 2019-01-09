@@ -1,10 +1,8 @@
 // draw.js
 
-import {all_users, cx, cy, dir, map, sx, sy, tile_buffer, user} from './game.js';
+import * as game from './game.js';
 
 export const canvas = document.getElementById('canvas');
-canvas.addEventListener("contextmenu",
-  function (e) {e.preventDefault();}, false);
 
 const ctx = canvas.getContext('2d');
 
@@ -18,6 +16,13 @@ charsheet.src = "static/charsheet.png";
 const optionsheet = new Image();
 optionsheet.src = "static/optionsheet.png";
 
+export let option_menu_vertices = [
+  [0, 0],
+  [0, 0],
+  [0, 0],
+  [0, 0]
+];
+
 // Small windows means smaller canvas.
 if (window.innerWidth < 500) {
   canvas.width = 330;
@@ -29,10 +34,10 @@ export function draw() {
   const canvas_width = canvas.width - 60;
   const canvas_height = canvas.height - 20;
   ctx.clearRect(0, 0, canvas_width, canvas_height);
-  for (let x = 0; x < canvas_width; x += tile_buffer) {
-    const curr_x = x/tile_buffer+(cx-sx);
-    for (let y = 0; y < canvas_height; y += tile_buffer) {
-      const tile = map[y/tile_buffer+(cy-sy)][curr_x];
+  for (let x = 0; x < canvas_width; x += game.tile_buffer) {
+    const curr_x = x/game.tile_buffer+(game.cx-game.sx);
+    for (let y = 0; y < canvas_height; y += game.tile_buffer) {
+      const tile = game.map[y/game.tile_buffer+(game.cy-game.sy)][curr_x];
       if (Array.isArray(tile)) {
         for (const def in tile) {
           drawTile(tile[def], x, y);
@@ -45,15 +50,18 @@ export function draw() {
   }
 
   drawSidePanel();
-
   drawOthers();
 
   // Fill the local character tile
   if (charsheet.complete) {
-    drawPlayer(sx, sy, dir, user);
+    drawPlayer(game.sx, game.sy, game.dir, game.user);
   }
   else {
     charsheet.addEventListener('load', drawPlayer);
+  }
+
+  if (game.options.length > 0) {
+    drawRightClickOptions();
   }
 
   // Fill the position
@@ -61,7 +69,7 @@ export function draw() {
   ctx.strokeStyle = "black";
   ctx.fillRect(0, canvas_height, canvas_width, 20);
   ctx.strokeText(
-    "(" + cx + ", " + cy + ")",
+    "(" + game.cx + ", " + game.cy + ")",
     canvas_width - 40, canvas_height + 10
   );
 }
@@ -75,42 +83,56 @@ function drawTile(tile, x, y) {
     tilesheet.load = drawImage.bind(tile, x, y);
   }
   ctx.moveTo(x, y);
-  ctx.lineTo(x + tile_buffer, y);
+  ctx.lineTo(x + game.tile_buffer, y);
   ctx.moveTo(x, y);
-  ctx.lineTo(x, y + tile_buffer);
+  ctx.lineTo(x, y + game.tile_buffer);
   ctx.stroke();
   ctx.closePath();
 }
 
 function drawPlayer(x_, y_, direction, username) {
   ctx.strokeStyle = "transparent";
-  ctx.drawImage(charsheet, direction * tile_buffer, 0,
-    tile_buffer, tile_buffer, x_*tile_buffer, y_*tile_buffer, tile_buffer, tile_buffer)
+  ctx.drawImage(charsheet,
+    direction * game.tile_buffer, 0,
+    game.tile_buffer, game.tile_buffer,
+    x_ * game.tile_buffer, y_ * game.tile_buffer,
+    game.tile_buffer, game.tile_buffer
+  )
 
   ctx.fillStyle = "black";
   ctx.font = "10pt Arial";
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
-  ctx.fillText(username, x_*tile_buffer + (tile_buffer / 2), y_*tile_buffer - 2);
+  ctx.fillText(username,
+    x_ * game.tile_buffer + (game.tile_buffer / 2),
+    y_ * game.tile_buffer - 2
+  );
 }
 
 function drawImage(tile, x, y) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(tilesheet,
-    (tile % 10) * tile_buffer, Math.floor(tile / 10) * tile_buffer,
-    tile_buffer, tile_buffer, x, y, tile_buffer, tile_buffer);
+    (tile % 10) * game.tile_buffer,
+    Math.floor(tile / 10) * game.tile_buffer,
+    game.tile_buffer, game.tile_buffer,
+    x, y,
+    game.tile_buffer, game.tile_buffer
+  );
 }
 
 function drawOthers() {
-  for (const u in all_users) {
-    if (u != user) {
-      const ucx = all_users[u].cx;
-      const ucy = all_users[u].cy;
-      const x = ucx - cx;
-      const y = ucy - cy;
+  for (const u in game.all_users) {
+    if (u != game.user) {
+      const ucx = game.all_users[u].cx;
+      const ucy = game.all_users[u].cy;
+      const x = ucx - game.cx;
+      const y = ucy - game.cy;
       if (x >= -sx && x <= sx && y >= -sy && y <= sy) {
         // Fill the character tile
-        drawPlayer(x+sx, y+sy, all_users[u].direction, all_users[u].username)
+        drawPlayer(x + game.sx, y + game.sy,
+          game.all_users[u].direction,
+          game.all_users[u].username
+        )
       }
     }
   }
@@ -118,5 +140,40 @@ function drawOthers() {
 
 function drawSidePanel() {
   ctx.strokeStyle = "transparent";
-  ctx.drawImage(optionsheet, 0, 0, 60, 450, canvas.width - 60, 0, 60, 450);
+  ctx.drawImage(optionsheet,
+    0, 0,
+    60, 450,
+    canvas.width - 60, 0,
+    60, 450
+  );
+}
+
+function drawRightClickOptions() {
+  let longest = 0;
+  game.options.forEach(function(s) {
+    if (s.length > longest) {
+      longest = s.length;
+    }
+  });
+  let box_width = 10 * longest;
+  let box_height = 25 * game.options.length;
+  ctx.fillStyle = "black";
+  ctx.strokeStyle = "white";
+  ctx.fillRect(
+    game.last_click_x,
+    game.last_click_y,
+    box_width, box_height
+  );
+  option_menu_vertices = [
+    [game.last_click_x, game.last_click_y],
+    [game.last_click_x + box_width, game.last_click_y],
+    [game.last_click_x + box_width, game.last_click_y + box_height],
+    [game.last_click_x, game.last_click_y + box_height]
+  ];
+  game.options.forEach(function(s){
+    ctx.strokeText(s,
+      game.last_click_x + Math.floor(box_width / 2),
+      game.last_click_y + Math.floor(box_height / 2)
+    );
+  });
 }
