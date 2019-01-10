@@ -131,7 +131,7 @@ function drawOthers() {
       const ucy = game.all_users[u].cy;
       const x = ucx - game.cx;
       const y = ucy - game.cy;
-      if (x >= -sx && x <= sx && y >= -sy && y <= sy) {
+      if (x >= -game.sx && x <= game.sx && y >= -game.sy && y <= game.sy) {
         // Fill the character tile
         drawPlayer(x + game.sx, y + game.sy,
           game.all_users[u].direction,
