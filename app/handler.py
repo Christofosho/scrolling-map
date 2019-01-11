@@ -58,7 +58,7 @@ class Handler:
         [user.x, user.y, 0],
         MAPS[user.map_id],
         ENTITIES,
-        [constants.TILE_BUFFER, constants.DEFAULT_X, constants.DEFAULT_Y]
+        [constants.TILE_BUFFER, constants.BORDER_TILES]
       ]
       sender.send_initialize_player(request, data)
 

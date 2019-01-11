@@ -14,8 +14,7 @@ export let cx = 0;
 export let cy = 0;
 export let dir = 0;
 
-export let sx = 0;
-export let sy = 0;
+export let border_size = 0;
 export let last_click_x = -1;
 export let last_click_y = -1;
 
@@ -197,18 +196,18 @@ function getTile(x_, y_) {
   let click_y = Math.floor(y_ / 30);
   let tile_x = -1;
   let tile_y = -1;
-  if (sy > click_y) {
-    tile_y = cy - (sy - click_y);
+  if (border_size > click_y) {
+    tile_y = cy - (border_size - click_y);
   }
   else {
-    tile_y = cy + (click_y - sy);
+    tile_y = cy + (click_y - border_size);
   }
 
-  if (sx > click_x) {
-    tile_x = cx - (sx - click_x);
+  if (border_size > click_x) {
+    tile_x = cx - (border_size - click_x);
   }
   else {
-    tile_x = cx + (click_x - sx);
+    tile_x = cx + (click_x - border_size);
   }
 
   return map[tile_y][tile_x];
@@ -369,10 +368,9 @@ let last;
   // Recieves and populates initial data.
   socket.on('init_data', function (data) {
     data = JSON.parse(data);
-    [user, [cx, cy, dir], map, entities, [tile_buffer, sx, sy]] = data;
+    [user, [cx, cy, dir], map, entities, [tile_buffer, border_size]] = data;
     if (draw.canvas.width < 450) {
-      sx = 4;
-      sy = 4;
+      border_size = 4;
     }
     loadMap(0);
   });

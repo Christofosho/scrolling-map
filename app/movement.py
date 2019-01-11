@@ -2,7 +2,7 @@
 # Handles movement actions.
 
 from app.definitions import MAPS, ENTITIES
-from app.constants import BLOCKING, DEFAULT_X, DEFAULT_Y
+from app.constants import BLOCKING, BORDER_TILES, DEFAULT_X, DEFAULT_Y
 
 tile_options = [entity['blocking'] for entity in ENTITIES]
 
@@ -22,8 +22,8 @@ def move_self(user, direction):
   cx = curr_cx = user.x
   cy = curr_cy = user.y
   map_data = MAPS.get(user.map_id)
-  ex = len(map_data[0]) - DEFAULT_X
-  ey = len(map_data) - DEFAULT_Y
+  ex = len(map_data[0]) - BORDER_TILES
+  ey = len(map_data) - BORDER_TILES
 
   cx, cy = check_direction(direction, cx, cy, ex, ey)
   tile = map_data[cy][cx]
@@ -55,7 +55,7 @@ def move_self(user, direction):
 def check_direction(direction, cx, cy, ex, ey):
   # Left
   if direction in (37, 65):
-    if cx > DEFAULT_X: # Boundary check
+    if cx > BORDER_TILES: # Boundary check
       cx -= 1
 
   # Right
@@ -70,7 +70,7 @@ def check_direction(direction, cx, cy, ex, ey):
 
   # Up
   elif direction in (38, 87):
-    if cy > DEFAULT_Y: # Boundary check
+    if cy > BORDER_TILES: # Boundary check
       cy -= 1
 
   return cx, cy

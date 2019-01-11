@@ -35,9 +35,9 @@ export function draw() {
   const canvas_height = canvas.height - 20;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let x = 0; x < canvas_width; x += game.tile_buffer) {
-    const curr_x = x/game.tile_buffer+(game.cx-game.sx);
+    const curr_x = x/game.tile_buffer+(game.cx-game.border_size);
     for (let y = 0; y < canvas_height; y += game.tile_buffer) {
-      const tile = game.map[y/game.tile_buffer+(game.cy-game.sy)][curr_x];
+      const tile = game.map[y/game.tile_buffer+(game.cy-game.border_size)][curr_x];
       if (Array.isArray(tile)) {
         for (const def in tile) {
           drawTile(tile[def], x, y);
@@ -54,7 +54,7 @@ export function draw() {
 
   // Fill the local character tile
   if (charsheet.complete) {
-    drawPlayer(game.sx, game.sy, game.dir, game.user);
+    drawPlayer(game.border_size, game.border_size, game.dir, game.user);
   }
   else {
     charsheet.addEventListener('load', drawPlayer);
@@ -71,10 +71,11 @@ export function draw() {
   // Fill the position
   ctx.fillStyle = "white";
   ctx.strokeStyle = "black";
+  ctx.textAlign = "end";
   ctx.fillRect(0, canvas_height, canvas_width, 20);
   ctx.strokeText(
     "(" + game.cx + ", " + game.cy + ")",
-    canvas_width - 40, canvas_height + 10
+    canvas_width - 5, canvas_height + 10
   );
 }
 
@@ -131,9 +132,10 @@ function drawOthers() {
       const ucy = game.all_users[u].cy;
       const x = ucx - game.cx;
       const y = ucy - game.cy;
-      if (x >= -game.sx && x <= game.sx && y >= -game.sy && y <= game.sy) {
+      if (x >= -game.border_size && x <= game.border_size
+        && y >= -game.border_size && y <= game.border_size) {
         // Fill the character tile
-        drawPlayer(x + game.sx, y + game.sy,
+        drawPlayer(x + game.border_size, y + game.border_size,
           game.all_users[u].direction,
           game.all_users[u].username
         )
@@ -153,9 +155,8 @@ function drawSidePanel() {
 }
 
 function drawRightClickExamine() {
-  let len = game.examine.length;
-  let box_width = 7 * len;
-  let box_height = 25;
+  let box_width = ctx.measureText(game.examine).width + 10;
+  let box_height = 22;
 
   ctx.fillStyle = "black";
   ctx.fillRect(
@@ -172,6 +173,7 @@ function drawRightClickExamine() {
   ];
 
   ctx.fillStyle = "white";
+  ctx.textAlign = "center";
   ctx.fillText(game.examine,
     game.last_click_x + Math.floor(box_width / 2),
     game.last_click_y + Math.floor(box_height / 2)
@@ -180,5 +182,7 @@ function drawRightClickExamine() {
 
 function drawObjectName() {
   ctx.fillStyle = "white";
-  ctx.fillText(game.object_name, canvas.width - 120, 10);
+  ctx.textAlign = "end";
+  ctx.fillText(game.object_name,
+    canvas.width - 65, 10);
 }

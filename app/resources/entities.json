@@ -35,5 +35,37 @@
     "blocking": 0,
     "interact": "replace",
     "examine": "It's a wooden gate. It can be closed."
+  },
+  {
+    "entity_id": 5,
+    "type": "tile",
+    "name": "black",
+    "blocking": 1
+  },
+  {
+    "entity_id": 6,
+    "type": "tile",
+    "name": "purple_carpet_1",
+    "blocking": 0
+  },
+  {
+    "entity_id": 7,
+    "type": "tile",
+    "name": "eggshell_wall_1",
+    "blocking": 1
+  },
+  {
+    "entity_id": 8,
+    "type": "portal",
+    "name": "portal_1",
+    "blocking": 0
+  },
+  {
+    "entity_id": 9,
+    "type": "object",
+    "name": "Dresser",
+    "blocking": 1,
+    "interact": "clothing",
+    "examine": "It's a dresser. It holds clothes."
   }
 ]
