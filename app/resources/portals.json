@@ -1,0 +1,20 @@
+{
+    "start": [
+        {
+            "portal_id": 0,
+            "x": 14,
+            "y": 9,
+            "related_map": "hall",
+            "related_id": 1
+        }
+    ],
+    "hall": [
+        {
+            "portal_id": 1,
+            "x": 7,
+            "y": 9,
+            "related_map": "start",
+            "related_id": 0
+        }
+    ]
+}

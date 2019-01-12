@@ -6,7 +6,7 @@ import time
 from app import constants, database, helpers
 from app import movement, objects, sender
 from app.entity.player import Player
-from app.definitions import *
+from app.definitions import ENTITIES, MAPS
 
 
 class Handler:
@@ -84,7 +84,7 @@ class Handler:
 
     ## Pickup items
     if action == constants.SPACEBAR:
-      sender.send_map_data(socket, handle_pickup(owner))
+      # sender.send_map_data(socket, handle_pickup(owner))
       action_occurred = True
 
     ## Use objects
@@ -99,6 +99,7 @@ class Handler:
       if obj:
         objects.determine_interaction(socket, owner, obj, obj_x, obj_y)
 
+    ## Move
     elif action in constants.MOVEMENTS:
       moved, cx, cy = movement.move_self(owner, action)
       owner.direction = constants.DIRECTION_OFFSETS[action]
@@ -106,6 +107,9 @@ class Handler:
         owner.x = cx
         owner.y = cy
         action_occurred = True
+
+      if movement.check_for_portal(owner):
+        sender.send_map_data(socket, self.users)
 
       sender.send_movement(request, owner)
       sender.update_all_players(socket, self.users)

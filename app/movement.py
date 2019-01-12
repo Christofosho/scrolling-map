@@ -1,7 +1,7 @@
 ### movement.py
 # Handles movement actions.
 
-from app.definitions import MAPS, ENTITIES
+from app.definitions import MAPS, ENTITIES, PORTALS
 from app.constants import BLOCKING, BORDER_TILES, DEFAULT_X, DEFAULT_Y
 
 tile_options = [entity['blocking'] for entity in ENTITIES]
@@ -74,3 +74,52 @@ def check_direction(direction, cx, cy, ex, ey):
       cy -= 1
 
   return cx, cy
+
+""" check_for_portal(owner)
+
+  Checks if a portal is on the given tile, and
+  sets an owner's new map and coordinates if true.
+
+  In:
+    owner: obj (user object)
+  
+  Out:
+    bool
+"""
+def check_for_portal(owner):
+  map = MAPS.get(owner.map_id)
+  tile = map[owner.y][owner.x]
+  if (isinstance(tile, list)
+    and ENTITIES[tile[1]].get("type") == "portal"):
+    # Get our current portal position
+    portal = get_portal(owner.map_id, owner.x, owner.y)
+    if portal:
+      # Get the related portal
+      new_portal = get_portal(
+        portal.get("related_map"),
+        -1, -1,
+        related_id=portal.get("related_id")
+      )
+
+      owner.map_id = portal.get("related_map")
+      owner.x = new_portal.get("x")
+      owner.y = new_portal.get("y")
+      return True
+  return False
+
+def get_portal(map_id, x, y, related_id=-1):
+
+  map_portals = PORTALS.get(map_id)
+  for portal in map_portals:
+
+    # Related id has been specified, use it.
+    if related_id > -1 and portal.get("portal_id") == related_id:
+        return portal
+
+    else:
+      # If our user is on the portal,
+      # get the related portal info.
+      if portal.get("x") == x and portal.get("y") == y:
+        return portal
+
+  return {}
