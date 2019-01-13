@@ -1,6 +1,7 @@
 // draw.js
 
-import * as game from './game.js';
+import * as game from './game';
+import * as settings from './settings';
 
 export const canvas = document.getElementById('canvas');
 
@@ -23,6 +24,13 @@ export let examine_menu_vertices = [
   [0, 0]
 ];
 
+export const OVERLAYS = {
+  None: 0,
+  Settings: 1,
+  Inventory: 2
+};
+export let overlay = OVERLAYS.None;
+
 // Small windows means smaller canvas.
 if (window.innerWidth < 500) {
   canvas.width = 330;
@@ -34,6 +42,38 @@ export function draw() {
   const canvas_width = canvas.width - 60;
   const canvas_height = canvas.height - 20;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (overlay == OVERLAYS.Settings) {
+    drawSettings(canvas_width, canvas_height);
+  }
+  else {
+    drawTiles(canvas_width, canvas_height);
+    drawOthers();
+
+    // Fill the local character tile
+    if (charsheet.complete) {
+      drawPlayer(game.border_size, game.border_size, game.dir, game.user);
+    }
+    else {
+      charsheet.addEventListener('load', drawPlayer);
+    }
+
+    if (game.object_name.length > 0) {
+      drawObjectName();
+    }
+
+    if (game.examine.length > 0) {
+      drawRightClickExamine();
+    }
+  }
+
+  if (settings.settings.coordinates) {
+    drawCoordinates(canvas_width, canvas_height);
+  }
+  drawSidePanel();
+}
+
+function drawTiles(canvas_width, canvas_height) {
   for (let x = 0; x < canvas_width; x += game.tile_buffer) {
     const curr_x = x/game.tile_buffer+(game.cx-game.border_size);
     for (let y = 0; y < canvas_height; y += game.tile_buffer) {
@@ -48,35 +88,6 @@ export function draw() {
       }
     }
   }
-
-  drawSidePanel();
-  drawOthers();
-
-  // Fill the local character tile
-  if (charsheet.complete) {
-    drawPlayer(game.border_size, game.border_size, game.dir, game.user);
-  }
-  else {
-    charsheet.addEventListener('load', drawPlayer);
-  }
-
-  if (game.object_name.length > 0) {
-    drawObjectName();
-  }
-
-  if (game.examine.length > 0) {
-    drawRightClickExamine();
-  }
-
-  // Fill the position
-  ctx.fillStyle = "white";
-  ctx.strokeStyle = "black";
-  ctx.textAlign = "end";
-  ctx.fillRect(0, canvas_height, canvas_width, 20);
-  ctx.strokeText(
-    "(" + game.cx + ", " + game.cy + ")",
-    canvas_width - 5, canvas_height + 10
-  );
 }
 
 function drawTile(tile, x, y) {
@@ -104,14 +115,16 @@ function drawPlayer(x_, y_, direction, username) {
     game.tile_buffer, game.tile_buffer
   )
 
-  ctx.fillStyle = "black";
-  ctx.font = "10pt Arial";
-  ctx.textBaseline = "middle";
-  ctx.textAlign = "center";
-  ctx.fillText(username,
-    x_ * game.tile_buffer + (game.tile_buffer / 2),
-    y_ * game.tile_buffer - 2
-  );
+  if (settings.settings.player_names) {
+    ctx.fillStyle = "black";
+    ctx.font = "10pt Arial";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.fillText(username,
+      x_ * game.tile_buffer + (game.tile_buffer / 2),
+      y_ * game.tile_buffer - 2
+    );
+  }
 }
 
 function drawImage(tile, x, y) {
@@ -185,4 +198,42 @@ function drawObjectName() {
   ctx.textAlign = "end";
   ctx.fillText(game.object_name,
     canvas.width - 65, 10);
+}
+
+function drawCoordinates(canvas_width, canvas_height) {
+  // Fill the position
+  ctx.fillStyle = "white";
+  ctx.textAlign = "end";
+  ctx.fillRect(0, canvas_height, canvas_width, 20);
+  ctx.font = "12pt Arial";
+  ctx.fillStyle = "black";
+  ctx.fillText(
+    "(" + game.cx + ", " + game.cy + ")",
+    canvas_width - 5, canvas_height + 10
+  );
+}
+
+function drawOverlay(canvas_width, canvas_height) {
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, canvas_width, canvas_height);
+}
+
+function drawSettings(canvas_width, canvas_height) {
+  drawOverlay(canvas_width, canvas_height);
+  ctx.fillStyle = "black";
+  ctx.textAlign = "start";
+
+  // Show player names
+  ctx.fillText(
+    "Show Player Names: " + (settings.settings.player_names ? "On" : "Off"),
+    canvas_width / 4 + 5,
+    62
+  );
+
+  // Show current coordinates
+  ctx.fillText(
+    "Show Coordinates: " + (settings.settings.coordinates ? "On" : "Off"),
+    canvas_width / 4 + 5,
+    85
+  );
 }

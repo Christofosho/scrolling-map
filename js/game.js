@@ -2,6 +2,7 @@
 
 // import '@babel/polyfill';
 import * as draw from './draw';
+import * as settings from './settings';
 
 /* Initializing */
 const socket = io.connect('//' + document.domain + ':' + location.port);
@@ -42,28 +43,87 @@ let hover_y = -1;
 function determineLeftClick(click_x, click_y) {
   let canvas_width = draw.canvas.width - 60;
   let canvas_height = draw.canvas.height - 20;
-  if (click_x > canvas_width || click_y > canvas_height) {
-    return;
-  }
 
-  const mid_offset = 15;
   const mid_width = Math.floor(canvas_width / 2);
   const mid_height = Math.floor(canvas_height / 2);
+  const mid_offset = Math.floor(tile_buffer / 2);
   const mid_low = mid_width - mid_offset;
   const mid_high = mid_width + mid_offset;
 
   resetExamine();
 
+  // We divide this into "paged" checking
+  // Return if we find a matching click, to avoid multiple
+  // executions.
+
+  // Settings scope
+  if (draw.overlay == draw.OVERLAYS.Settings) {
+
+    // Check if a setting is clicked. If so, send data to server.
+    if (settings.handleClick(click_x, click_y, canvas_width, canvas_height)) {
+      return;
+    }
+  }
+
+  // Inventory scope
+  else if (draw.overlay == draw.OVERLAYS.Inventory) {
+    // Check for inventory interaction here.
+  }
+
+  // Map scope
+  else if (draw.overlay == draw.OVERLAYS.None) {
+    if (clickUnderTile(click_x, click_y, mid_low, mid_high)) {
+      return;
+    }
+
+    if (clickCloseTile(click_x, click_y, mid_low, mid_high)) {
+      return;
+    }
+
+    if (clickFarTile(click_x, click_y, canvas_width, canvas_height, mid_width, mid_height)) {
+      return;
+    }
+  }
+
+  // General scope
+  if (checkMenuIconClicked(click_x, click_y, canvas_width)) {
+    return;
+  }
+
+}
+
+function checkMenuIconClicked(click_x, click_y, canvas_width) {
+  // Click on settings menu
+  if (polygon_click_test(4,
+    [canvas_width, canvas.width, canvas.width, canvas_width], // x values
+    [0, 0, 60, 60], /* y values */ click_x, click_y)) {
+    draw.overlay = draw.overlay == draw.OVERLAYS.None ?
+      draw.OVERLAYS.Settings : draw.OVERLAYS.None;
+  }
+
+  else if (polygon_click_test(4,
+    [canvas_width, canvas.width, canvas.width, canvas_width], // x values
+    [60, 60, 120, 120], /* y values */ click_x, click_y)) {
+    draw.overlay = draw.overlay == draw.OVERLAYS.None ?
+      draw.OVERLAYS.Inventory : draw.OVERLAYS.None;
+  }
+}
+
+function clickUnderTile(click_x, click_y, mid_low, mid_high) {
   // Click on middle square (where player is standing)
   if (polygon_click_test(4,
     [mid_low, mid_high, mid_high, mid_low], // x values
     [mid_low, mid_low, mid_high, mid_high], // y values
     click_x, click_y)) {
     sendAction({'keyCode': 32, 'preventDefault': function(){}}); // Spacebar
+    return true;
   }
+  return false;
+}
 
+function clickCloseTile(click_x, click_y, mid_low, mid_high) {
   // Click on square directly above player location.
-  else if (polygon_click_test(4,
+  if (polygon_click_test(4,
     [mid_low, mid_high, mid_high, mid_low], // x values
     [mid_low - tile_buffer, mid_low - tile_buffer, mid_low, mid_low], // y values
     click_x, click_y)) {
@@ -73,9 +133,10 @@ function determineLeftClick(click_x, click_y) {
     else {
       sendAction({'keyCode': 38, 'preventDefault': function(){}}); // Up
     }
+    return true;
   }
 
-  // Click on square directly below player location.
+  // Click on square one below player location.
   else if (polygon_click_test(4,
     [mid_low, mid_low, mid_high, mid_high], // x values
     [mid_high, mid_high + tile_buffer, mid_high + tile_buffer, mid_high], // y values
@@ -86,6 +147,7 @@ function determineLeftClick(click_x, click_y) {
     else {
       sendAction({'keyCode': 40, 'preventDefault': function(){}}); // Up
     }
+    return true;
   }
 
   // Click on square directly left player location.
@@ -99,6 +161,7 @@ function determineLeftClick(click_x, click_y) {
     else {
       sendAction({'keyCode': 37, 'preventDefault': function(){}}); // Up
     }
+    return true;
   }
 
   // Click on square directly right player location.
@@ -112,28 +175,39 @@ function determineLeftClick(click_x, click_y) {
     else {
       sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Up
     }
+    return true;
   }
+  return false;
+}
 
-  else if (polygon_click_test(3,
+function clickFarTile(click_x, click_y, canvas_width, canvas_height, mid_width, mid_height) {
+
+  /* Movement */
+  if (polygon_click_test(3,
     [0, mid_width, canvas_width], [0, mid_height, 0],
-    click_x, click_y)) {
-    sendAction({'keyCode': 38, 'preventDefault': function(){}}); // Up
+    click_x, click_y)) { // Up
+    sendAction({'keyCode': 38, 'preventDefault': function(){}});
+    return true;
   }
   else if (polygon_click_test(3,
     [0, mid_width, canvas_width], [canvas_height, mid_height, canvas_height],
-    click_x, click_y)) {
-    sendAction({'keyCode': 40, 'preventDefault': function(){}}); // Down
+    click_x, click_y)) { // Down
+    sendAction({'keyCode': 40, 'preventDefault': function(){}});
+    return true;
   }
   else if (polygon_click_test(3,
     [0, mid_width, 0], [0, mid_height, canvas_height],
-    click_x, click_y)) {
-    sendAction({'keyCode': 37, 'preventDefault': function(){}}); // Left
+    click_x, click_y)) { // Left
+    sendAction({'keyCode': 37, 'preventDefault': function(){}});
+    return true;
   }
   else if (polygon_click_test(3,
     [canvas_width, mid_width, canvas_width], [0, mid_height, canvas_height],
-    click_x, click_y)) {
-    sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Right
+    click_x, click_y)) { // Right
+    sendAction({'keyCode': 39, 'preventDefault': function(){}});
+    return true;
   }
+  return false;
 }
 
 // polygon_click_test by Wm. Randolph Franklin
@@ -142,7 +216,7 @@ function determineLeftClick(click_x, click_y) {
 // as a list of x coordinates and a second list of y coordinates.
 // Tests against clicked coordinates to determine whether the
 // click was within the polygon formed by said vertices.
-function polygon_click_test( nvert, vertx, verty, testx, testy ) {
+export function polygon_click_test( nvert, vertx, verty, testx, testy ) {
     let i, j, c = false;
     for( i = 0, j = nvert-1; i < nvert; j = i++ ) {
         if( ( ( verty[i] > testy ) != ( verty[j] > testy ) ) &&
