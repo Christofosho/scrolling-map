@@ -1,6 +1,7 @@
 // draw.js
 
 import * as game from './game';
+import * as player from './player';
 import * as settings from './settings';
 
 export const canvas = document.getElementById('canvas');
@@ -52,7 +53,7 @@ export function draw() {
 
     // Fill the local character tile
     if (charsheet.complete) {
-      drawPlayer(game.border_size, game.border_size, game.dir, game.user);
+      drawPlayer(game.border_size, game.border_size, player.dir, player.username);
     }
     else {
       charsheet.addEventListener('load', drawPlayer);
@@ -75,9 +76,9 @@ export function draw() {
 
 function drawTiles(canvas_width, canvas_height) {
   for (let x = 0; x < canvas_width; x += game.tile_buffer) {
-    const curr_x = x/game.tile_buffer+(game.cx-game.border_size);
+    const curr_x = x/game.tile_buffer+(player.cx-game.border_size);
     for (let y = 0; y < canvas_height; y += game.tile_buffer) {
-      const tile = game.map[y/game.tile_buffer+(game.cy-game.border_size)][curr_x];
+      const tile = game.map[y/game.tile_buffer+(player.cy-game.border_size)][curr_x];
       if (Array.isArray(tile)) {
         for (const def in tile) {
           drawTile(tile[def], x, y);
@@ -140,11 +141,11 @@ function drawImage(tile, x, y) {
 
 function drawOthers() {
   for (const u in game.all_users) {
-    if (u != game.user) {
+    if (u != player.username) {
       const ucx = game.all_users[u].cx;
       const ucy = game.all_users[u].cy;
-      const x = ucx - game.cx;
-      const y = ucy - game.cy;
+      const x = ucx - player.cx;
+      const y = ucy - player.cy;
       if (x >= -game.border_size && x <= game.border_size
         && y >= -game.border_size && y <= game.border_size) {
         // Fill the character tile
@@ -208,7 +209,7 @@ function drawCoordinates(canvas_width, canvas_height) {
   ctx.font = "12pt Arial";
   ctx.fillStyle = "black";
   ctx.fillText(
-    "(" + game.cx + ", " + game.cy + ")",
+    "(" + player.cx + ", " + player.cy + ")",
     canvas_width - 5, canvas_height + 10
   );
 }

@@ -3,17 +3,12 @@
 // import '@babel/polyfill';
 import * as draw from './draw';
 import * as settings from './settings';
+import * as player from './player';
 
 /* Initializing */
 export const socket = io.connect('//' + document.domain + ':' + location.port);
 
-export let user = "";
 export let all_users = {};
-
-// character start (0,0)
-export let cx = 0;
-export let cy = 0;
-export let dir = 0;
 
 export let border_size = 0;
 export let last_click_x = -1;
@@ -127,7 +122,7 @@ function clickCloseTile(click_x, click_y, mid_low, mid_high) {
     [mid_low, mid_high, mid_high, mid_low], // x values
     [mid_low - tile_buffer, mid_low - tile_buffer, mid_low, mid_low], // y values
     click_x, click_y)) {
-    if (dir == 1 && containsObject(cx, cy-1)) {
+    if (player.dir == 1 && containsObject(player.cx, player.cy-1)) {
       sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
     else {
@@ -141,7 +136,7 @@ function clickCloseTile(click_x, click_y, mid_low, mid_high) {
     [mid_low, mid_low, mid_high, mid_high], // x values
     [mid_high, mid_high + tile_buffer, mid_high + tile_buffer, mid_high], // y values
     click_x, click_y)) {
-    if (dir == 0 && containsObject(cx, cy+1)) {
+    if (player.dir == 0 && containsObject(player.cx, player.cy+1)) {
       sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
     else {
@@ -155,7 +150,7 @@ function clickCloseTile(click_x, click_y, mid_low, mid_high) {
     [mid_low - tile_buffer, mid_low, mid_low, mid_low - tile_buffer], // x values
     [mid_low, mid_low, mid_high, mid_high], // y values
     click_x, click_y)) {
-    if (dir == 3 && containsObject(cx-1, cy)) {
+    if (player.dir == 3 && containsObject(player.cx-1, player.cy)) {
       sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
     else {
@@ -169,7 +164,7 @@ function clickCloseTile(click_x, click_y, mid_low, mid_high) {
     [mid_high, mid_high + tile_buffer, mid_high + tile_buffer, mid_high], // x values
     [mid_low, mid_low, mid_high, mid_high], // y values
     click_x, click_y)) {
-    if (dir == 2 && containsObject(cx+1, cy)) {
+    if (player.dir == 2 && containsObject(player.cx+1, player.cy)) {
       sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
     else {
@@ -271,17 +266,17 @@ function getTile(x_, y_) {
   let tile_x = -1;
   let tile_y = -1;
   if (border_size > click_y) {
-    tile_y = cy - (border_size - click_y);
+    tile_y = player.cy - (border_size - click_y);
   }
   else {
-    tile_y = cy + (click_y - border_size);
+    tile_y = player.cy + (click_y - border_size);
   }
 
   if (border_size > click_x) {
-    tile_x = cx - (border_size - click_x);
+    tile_x = player.cx - (border_size - click_x);
   }
   else {
-    tile_x = cx + (click_x - border_size);
+    tile_x = player.cx + (click_x - border_size);
   }
 
   return map[tile_y][tile_x];
@@ -355,15 +350,15 @@ function sendAction(e) {
   }
 
   socket.emit('json', JSON.stringify({
-    'username': user,
+    'username': player.username,
     'action': e.keyCode,
   }))
 }
 
 function doMove(movement) {
-  cx = movement.cx;
-  cy = movement.cy;
-  dir = movement.direction;
+  player.cx = movement.cx;
+  player.cy = movement.cy;
+  player.dir = movement.direction;
 }
 
 let last;
@@ -434,7 +429,7 @@ let last;
   }
 
   function checkDataAcquired() {
-    const got_user = user !== "";
+    const got_user = player.username !== "";
     const got_map = map !== undefined || map.length > 0;
     return got_user && got_map;
   }
@@ -442,7 +437,7 @@ let last;
   // Recieves and populates initial data.
   socket.on('init_data', function (data) {
     data = JSON.parse(data);
-    [user, [cx, cy, dir], map,
+    [player.username, [player.cx, player.cy, player.dir], map,
       entities, settings.settings,
       [tile_buffer, border_size]
     ] = data;
@@ -468,7 +463,7 @@ let last;
   // Moves the local player
   socket.on('movement_self', function (data) {
     data = JSON.parse(data);
-    if (user == data.username)
+    if (player.username == data.username)
       doMove(data);
   });
 

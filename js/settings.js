@@ -1,6 +1,7 @@
 // settings.js
 
 import * as game from './game';
+import * as player from './player';
 
 export let settings = {
   player_names: true,
@@ -13,10 +14,7 @@ export function handleClick(click_x, click_y, canvas_width, canvas_height) {
     [quarter_width, quarter_width*3, quarter_width*3, quarter_width], // x values
     [50, 50, 72, 72], /* y values */ click_x, click_y)) {
     settings.player_names = !settings.player_names;
-    game.socket.emit('settings', JSON.stringify({
-      'username': game.user,
-      'settings': settings,
-    }));
+    sendSettings();
     return true;
   }
 
@@ -24,11 +22,15 @@ export function handleClick(click_x, click_y, canvas_width, canvas_height) {
     [quarter_width, quarter_width*3, quarter_width*3, quarter_width], // x values
     [73, 73, 95, 95], /* y values */ click_x, click_y)) {
     settings.coordinates = !settings.coordinates;
-    game.socket.emit('settings', JSON.stringify({
-      'username': game.user,
-      'settings': settings,
-    }));
+    sendSettings();
     return true;
   }
   return false;
+}
+
+function sendSettings() {
+  game.socket.emit('settings', JSON.stringify({
+    'username': player.username,
+    'settings': settings,
+  }));
 }
