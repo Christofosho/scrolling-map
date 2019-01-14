@@ -59,7 +59,7 @@ def update_all_players(socket, users_data):
 def send_map_data(socket, users):
   for user in users.values():
     map = MAPS[user.map_id]
-    socket.emit('map_data', json.dumps(map), room=user.current_sid)
+    socket.emit('map_data', json.dumps([map, user.map_id]), room=user.current_sid)
 
 """ send_movement(request, owner)
 

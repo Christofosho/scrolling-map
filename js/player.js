@@ -10,3 +10,4 @@ export let cy = 0;
 export let dir = 0;
 
 export let current_map = [];
+export let current_map_name = "";

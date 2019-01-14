@@ -57,7 +57,7 @@ class Handler:
       data = [
         username,
         [user.x, user.y, 0],
-        MAPS[user.map_id],
+        [MAPS[user.map_id], user.map_id],
         ENTITIES,
         user.settings,
         [constants.TILE_BUFFER, constants.BORDER_TILES]

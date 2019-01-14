@@ -112,7 +112,8 @@ let last;
   // Recieves and populates initial data.
   socket.on('init_data', function (data) {
     data = JSON.parse(data);
-    [player.username, [player.cx, player.cy, player.dir], player.current_map,
+    [player.username, [player.cx, player.cy, player.dir],
+      [player.current_map, player.current_map_name],
       entities, settings.settings,
       [map.tile_buffer, map.border_size]
     ] = data;
@@ -128,7 +129,7 @@ let last;
 
   // Recieves and populates map data.
   socket.on('map_data', function (data) {
-    player.current_map = JSON.parse(data);
+    [player.current_map, player.current_map_name] = JSON.parse(data);
   });
 
   socket.on('entity_data', function (data) {

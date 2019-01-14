@@ -1,19 +1,19 @@
 {
-    "start": [
+    "Your Dormatory Room": [
         {
             "portal_id": 0,
             "x": 14,
             "y": 9,
-            "related_map": "hall",
+            "related_map": "Dormatory Hall",
             "related_id": 1
         }
     ],
-    "hall": [
+    "Dormatory Hall": [
         {
             "portal_id": 1,
             "x": 7,
             "y": 9,
-            "related_map": "start",
+            "related_map": "Your Dormatory Room",
             "related_id": 0
         }
     ]

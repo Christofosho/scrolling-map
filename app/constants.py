@@ -45,7 +45,7 @@ BORDER_TILES = 7 # Used to ensure user doesn't fall off the map.
 DEFAULT_X = 9
 DEFAULT_Y = 10
 TILE_BUFFER = 30
-DEFAULT_MAP = "start"
+DEFAULT_MAP = "Your Dormatory Room"
 
 ## Tile Option Constants
 BLOCKING = 1

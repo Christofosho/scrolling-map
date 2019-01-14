@@ -73,6 +73,7 @@ export function draw() {
   if (settings.settings.coordinates) {
     drawCoordinates(canvas_width, canvas_height);
   }
+  drawMapName(canvas_height);
   drawSidePanel();
 }
 
@@ -239,5 +240,14 @@ function drawSettings(canvas_width, canvas_height) {
     "Show Coordinates: " + (settings.settings.coordinates ? "On" : "Off"),
     canvas_width / 4 + 5,
     85
+  );
+}
+
+function drawMapName(canvas_height) {
+  ctx.fillStyle = "black";
+  ctx.textAlign = "start";
+  ctx.font = "bold 12pt Arial";
+  ctx.fillText(player.current_map_name,
+    5, canvas_height + 12
   );
 }
