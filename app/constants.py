@@ -49,3 +49,9 @@ DEFAULT_MAP = "start"
 
 ## Tile Option Constants
 BLOCKING = 1
+
+## Settings
+SETTINGS = { # Default first
+  'player_names': [True, False],
+  'coordinates': [False, True]
+}

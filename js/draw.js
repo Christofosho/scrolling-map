@@ -222,6 +222,7 @@ function drawSettings(canvas_width, canvas_height) {
   drawOverlay(canvas_width, canvas_height);
   ctx.fillStyle = "black";
   ctx.textAlign = "start";
+  ctx.font = "12pt Arial";
 
   // Show player names
   ctx.fillText(

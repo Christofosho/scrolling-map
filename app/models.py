@@ -12,6 +12,8 @@ class User(db.Model):
   last_login = db.Column(db.Integer, nullable=False)
   _bag = db.Column('bag', db.String(128), nullable=False,
                    default='[]', server_default='[]')
+  _settings = db.Column('settings', db.String(1024), nullable=False,
+                        default='{}', server_default='{}')
 
   def __repr__(self):
     return '<User %r>' % self.username
@@ -23,3 +25,11 @@ class User(db.Model):
   @bag.setter
   def bag(self, b):
     self._bag = json.dumps(b)
+
+  @hybrid_property
+  def settings(self):
+    return json.loads(self._settings)
+
+  @settings.setter
+  def settings(self, s):
+    self._settings = json.dumps(s)

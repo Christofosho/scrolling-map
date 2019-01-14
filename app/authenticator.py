@@ -2,6 +2,7 @@
 # Manages authentication and confirmation of users.
 
 from app import sender
+from app.constants import SETTINGS
 
 """ sanitize_username(username)
 
@@ -65,3 +66,30 @@ def validate_session(request, handler, data):
   if owner and (owner.current_sid == request.sid):
     return True
   return False
+
+""" validate_settings(data)
+
+  Ensures the settings data sent in is validated.
+
+  In:
+    data: obj (settings included)
+  
+  Out:
+    settings OR empty dict
+"""
+def validate_settings(data):
+  settings = data.get('settings', None)
+  if not settings:
+    return False
+
+  for k,v  in settings.items():
+
+    if k not in SETTINGS.keys():
+      # Invalid setting passed from client.
+      return False
+    s = SETTINGS.get(k, None)
+    if s and v not in s:
+      # Invalid value for setting passed from client.
+      return False
+
+  return True

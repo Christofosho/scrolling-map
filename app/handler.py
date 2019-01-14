@@ -39,6 +39,7 @@ class Handler:
     self.users[username] = Player(
       user.uid, username, user.x, user.y, user.map_id,
       request.sid, # Store SID to track session.
+      settings=user.settings,
       direction=0, bag=[], last_action=last_action
     )
 
@@ -58,6 +59,7 @@ class Handler:
         [user.x, user.y, 0],
         MAPS[user.map_id],
         ENTITIES,
+        user.settings,
         [constants.TILE_BUFFER, constants.BORDER_TILES]
       ]
       sender.send_initialize_player(request, data)
@@ -117,6 +119,18 @@ class Handler:
     if action_occurred:
       owner.last_action = int(time.time() * 1000) # Milliseconds
 
+  """ store_settings(data)
+
+    Stores settings for a player in their player object.
+
+    In:
+      data: obj (includes settings)
+  """
+  def store_settings(self, data):
+    owner = self.users.get(data.get('username'))
+    settings = data.get('settings')
+    owner.settings = settings
+    database.save_user(owner)
 
   """ handle_disconnect(socket, request)
 

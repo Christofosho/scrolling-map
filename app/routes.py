@@ -44,12 +44,30 @@ def retrieve_init_data(data):
 def action(data):
   data = json.loads(data)
   clean = authenticator.sanitize_username(data)
-  if clean:
-    valid = authenticator.validate_session(request, handler, data)
-    if not valid:
-      print("Redundant login for %s" % data.get('username', 'UNKNOWN_USER'))
-      return disconnect()
+  if not clean:
+    return
+    
+  valid = authenticator.validate_session(request, handler, data)
+  if not valid:
+    print("Bad login for %s" % data.get('username', 'UNKNOWN_USER'))
+    return disconnect()
 
-    handler.distribute(socketio, request, data)
+  handler.distribute(socketio, request, data)
+
+@socketio.on('settings')
+def settings(data):
+  data = json.loads(data)
+  clean = authenticator.sanitize_username(data)
+  if not clean:
+    return
+
+  valid = authenticator.validate_session(request, handler, data)
+  if not valid:
+    print("Bad login for %s" % data.get('username', 'UNKNOWN_USER'))
+    return disconnect()
+
+  settings = authenticator.validate_settings(data)
+  if settings:
+    handler.store_settings(data)
 
 a.secret_key = 'fake'

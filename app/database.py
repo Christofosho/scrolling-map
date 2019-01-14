@@ -4,7 +4,7 @@
 from app import db
 from app.models import User
 
-from app.constants import DEFAULT_MAP, DEFAULT_X, DEFAULT_Y
+from app.constants import DEFAULT_MAP, DEFAULT_X, DEFAULT_Y, SETTINGS
 
 """ retrieve_user(username)
 
@@ -35,6 +35,7 @@ def insert_user(username, last_action):
     map_id=DEFAULT_MAP,
     last_login=last_action
   )
+  user.settings = {k:v[0] for k,v in SETTINGS.items()}
   db.session.add(user)
   db.session.commit()
   return user
@@ -53,6 +54,7 @@ def save_user(user):
     db_user.y = user.y
     db_user.map_id = user.map_id
     db_user.last_login = user.last_action
+    db_user.settings = user.settings
     db.session.commit()
 
   except Exception as e:

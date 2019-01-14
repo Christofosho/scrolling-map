@@ -5,7 +5,7 @@ import * as draw from './draw';
 import * as settings from './settings';
 
 /* Initializing */
-const socket = io.connect('//' + document.domain + ':' + location.port);
+export const socket = io.connect('//' + document.domain + ':' + location.port);
 
 export let user = "";
 export let all_users = {};
@@ -442,7 +442,10 @@ let last;
   // Recieves and populates initial data.
   socket.on('init_data', function (data) {
     data = JSON.parse(data);
-    [user, [cx, cy, dir], map, entities, [tile_buffer, border_size]] = data;
+    [user, [cx, cy, dir], map,
+      entities, settings.settings,
+      [tile_buffer, border_size]
+    ] = data;
     if (draw.canvas.width < 450) {
       border_size = 4;
     }
