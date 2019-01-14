@@ -8,3 +8,5 @@ export let username = "";
 export let cx = 0;
 export let cy = 0;
 export let dir = 0;
+
+export let current_map = [];

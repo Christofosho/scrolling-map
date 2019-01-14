@@ -1,8 +1,10 @@
 // draw.js
 
 import * as game from './game';
+import * as input from './input';
 import * as player from './player';
 import * as settings from './settings';
+import * as map from './map';
 
 export const canvas = document.getElementById('canvas');
 
@@ -53,7 +55,7 @@ export function draw() {
 
     // Fill the local character tile
     if (charsheet.complete) {
-      drawPlayer(game.border_size, game.border_size, player.dir, player.username);
+      drawPlayer(map.border_size, map.border_size, player.dir, player.username);
     }
     else {
       charsheet.addEventListener('load', drawPlayer);
@@ -75,10 +77,10 @@ export function draw() {
 }
 
 function drawTiles(canvas_width, canvas_height) {
-  for (let x = 0; x < canvas_width; x += game.tile_buffer) {
-    const curr_x = x/game.tile_buffer+(player.cx-game.border_size);
-    for (let y = 0; y < canvas_height; y += game.tile_buffer) {
-      const tile = game.map[y/game.tile_buffer+(player.cy-game.border_size)][curr_x];
+  for (let x = 0; x < canvas_width; x += map.tile_buffer) {
+    const curr_x = x/map.tile_buffer+(player.cx-map.border_size);
+    for (let y = 0; y < canvas_height; y += map.tile_buffer) {
+      const tile = player.current_map[y/map.tile_buffer+(player.cy-map.border_size)][curr_x];
       if (Array.isArray(tile)) {
         for (const def in tile) {
           drawTile(tile[def], x, y);
@@ -100,9 +102,9 @@ function drawTile(tile, x, y) {
     tilesheet.load = drawImage.bind(tile, x, y);
   }
   ctx.moveTo(x, y);
-  ctx.lineTo(x + game.tile_buffer, y);
+  ctx.lineTo(x + map.tile_buffer, y);
   ctx.moveTo(x, y);
-  ctx.lineTo(x, y + game.tile_buffer);
+  ctx.lineTo(x, y + map.tile_buffer);
   ctx.stroke();
   ctx.closePath();
 }
@@ -110,10 +112,10 @@ function drawTile(tile, x, y) {
 function drawPlayer(x_, y_, direction, username) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(charsheet,
-    direction * game.tile_buffer, 0,
-    game.tile_buffer, game.tile_buffer,
-    x_ * game.tile_buffer, y_ * game.tile_buffer,
-    game.tile_buffer, game.tile_buffer
+    direction * map.tile_buffer, 0,
+    map.tile_buffer, map.tile_buffer,
+    x_ * map.tile_buffer, y_ * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer
   )
 
   if (settings.settings.player_names) {
@@ -122,8 +124,8 @@ function drawPlayer(x_, y_, direction, username) {
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     ctx.fillText(username,
-      x_ * game.tile_buffer + (game.tile_buffer / 2),
-      y_ * game.tile_buffer - 2
+      x_ * map.tile_buffer + (map.tile_buffer / 2),
+      y_ * map.tile_buffer - 2
     );
   }
 }
@@ -131,11 +133,11 @@ function drawPlayer(x_, y_, direction, username) {
 function drawImage(tile, x, y) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(tilesheet,
-    (tile % 10) * game.tile_buffer,
-    Math.floor(tile / 10) * game.tile_buffer,
-    game.tile_buffer, game.tile_buffer,
+    (tile % 10) * map.tile_buffer,
+    Math.floor(tile / 10) * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer,
     x, y,
-    game.tile_buffer, game.tile_buffer
+    map.tile_buffer, map.tile_buffer
   );
 }
 
@@ -146,10 +148,10 @@ function drawOthers() {
       const ucy = game.all_users[u].cy;
       const x = ucx - player.cx;
       const y = ucy - player.cy;
-      if (x >= -game.border_size && x <= game.border_size
-        && y >= -game.border_size && y <= game.border_size) {
+      if (x >= -map.border_size && x <= map.border_size
+        && y >= -map.border_size && y <= map.border_size) {
         // Fill the character tile
-        drawPlayer(x + game.border_size, y + game.border_size,
+        drawPlayer(x + map.border_size, y + map.border_size,
           game.all_users[u].direction,
           game.all_users[u].username
         )
@@ -174,23 +176,23 @@ function drawRightClickExamine() {
 
   ctx.fillStyle = "black";
   ctx.fillRect(
-    game.last_click_x,
-    game.last_click_y,
+    input.last_click_x,
+    input.last_click_y,
     box_width, box_height
   );
 
   examine_menu_vertices = [
-    [game.last_click_x - 5, game.last_click_y - 5],
-    [game.last_click_x + box_width + 5, game.last_click_y - 5],
-    [game.last_click_x + box_width + 5, game.last_click_y + box_height + 5],
-    [game.last_click_x - 5, game.last_click_y + box_height + 5]
+    [input.last_click_x - 5, input.last_click_y - 5],
+    [input.last_click_x + box_width + 5, input.last_click_y - 5],
+    [input.last_click_x + box_width + 5, input.last_click_y + box_height + 5],
+    [input.last_click_x - 5, input.last_click_y + box_height + 5]
   ];
 
   ctx.fillStyle = "white";
   ctx.textAlign = "center";
   ctx.fillText(game.examine,
-    game.last_click_x + Math.floor(box_width / 2),
-    game.last_click_y + Math.floor(box_height / 2)
+    input.last_click_x + Math.floor(box_width / 2),
+    input.last_click_y + Math.floor(box_height / 2)
   );
 }
 
