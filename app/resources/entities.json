@@ -67,5 +67,21 @@
     "blocking": 1,
     "interact": "clothing",
     "examine": "It's a dresser. It holds clothes."
+  },
+  {
+    "entity_id": 10,
+    "type": "object",
+    "name": "Bed",
+    "blocking": 1,
+    "interact": "rest",
+    "examine": "It's a bed. I can sleep on this."
+  },
+  {
+    "entity_id": 11,
+    "type": "object",
+    "name": "Bed",
+    "blocking": 1,
+    "interact": "rest",
+    "examine": "It's a bed. I can sleep on this."
   }
 ]
