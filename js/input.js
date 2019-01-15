@@ -80,18 +80,27 @@ function determineLeftClick(click_x, click_y) {
 }
 
 function checkMenuIconClicked(click_x, click_y, canvas_width) {
-  // Click on settings menu
+  // Click on settings menu icon
   if (polygon_click_test(4,
     [canvas_width, canvas.width, canvas.width, canvas_width], // x values
     [0, 0, 60, 60], /* y values */ click_x, click_y)) {
-    draw.overlay = draw.overlay == draw.OVERLAYS.None ?
+    draw.overlay = draw.overlay != draw.OVERLAYS.Settings ?
       draw.OVERLAYS.Settings : draw.OVERLAYS.None;
   }
 
+  // Click help icon
   else if (polygon_click_test(4,
     [canvas_width, canvas.width, canvas.width, canvas_width], // x values
     [60, 60, 120, 120], /* y values */ click_x, click_y)) {
-    draw.overlay = draw.overlay == draw.OVERLAYS.None ?
+    draw.overlay = draw.overlay != draw.OVERLAYS.Help ?
+      draw.OVERLAYS.Help : draw.OVERLAYS.None;
+  }
+
+  // Click inventory icon
+  else if (polygon_click_test(4,
+    [canvas_width, canvas.width, canvas.width, canvas_width], // x values
+    [60, 60, 120, 120], /* y values */ click_x, click_y)) {
+    draw.overlay = draw.overlay != draw.OVERLAYS.Inventory ?
       draw.OVERLAYS.Inventory : draw.OVERLAYS.None;
   }
 }
@@ -215,6 +224,7 @@ export function polygon_click_test( nvert, vertx, verty, testx, testy ) {
 }
 
 function setTouchCoords(e) {
+  e.preventDefault();
   last_click_x = e.touches[0].clientX - draw.canvas.getBoundingClientRect().left;
   last_click_y = e.touches[0].clientY - draw.canvas.getBoundingClientRect().top;
 }
@@ -287,8 +297,8 @@ export function listener() {
 
 export function clickListener() {
   draw.canvas.addEventListener('mousedown', getClickCoords);
-  draw.canvas.addEventListener('touchstart', setTouchCoords);
-  draw.canvas.addEventListener('touchend', getTouchCoords);
-  draw.canvas.addEventListener("contextmenu", setContextMenu);
-  draw.canvas.addEventListener("mousemove", handleMouseMovement);
+  draw.canvas.addEventListener('touchstart', setTouchCoords, { passive: false });
+  draw.canvas.addEventListener('touchend', getTouchCoords, { passive: false });
+  draw.canvas.addEventListener('contextmenu', setContextMenu);
+  draw.canvas.addEventListener('mousemove', handleMouseMovement);
 }

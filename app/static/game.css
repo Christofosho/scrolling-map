@@ -1,15 +1,37 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font: 20pt Arial;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100vh;
+}
+
+header {
+  width: 100vw;
+  height: 65px;
 }
 
 h1 {
   text-align: center;
 }
 
+main {
+  flex: 1;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff; /* Old browsers */
+  background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #ffffff 0%,#e5e5e5 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+}
+
 .help {
   text-align: center;
-  font-family: arial;
 }
 
 .centered {
@@ -24,7 +46,49 @@ h1 {
   display: none;
 }
 
+#auth {
+  width: 40vw;
+  margin: 0 auto;
+  border-radius: 5px;
+  margin-top: 10px;
+  padding: 5px 5px 10px;
+}
+
+#authentication {
+  display: flex;
+  flex-direction: column;
+}
+
+#authentication > label {
+  height: 30px;
+}
+
+#authentication > input {
+  width: 200px;
+  font: 16pt Arial;
+  border-color:black;
+  padding: 2px;
+  margin-top: 1vh;
+}
+
+#authentication > input#username {
+  height: 24px;
+  border-radius: 2px;
+  border-style: solid;
+  border-width: 2px;
+}
+
+#authentication > input#submit {
+  height: 40px;
+  border-style: outset;
+  border-width: 3px;
+}
+
+#authentication > input#submit:active {
+  border-style: inset;
+}
+
 #canvas {
-  margin-left: 60px;
   border: inset 3px grey;
+  touch-action: manipulation;
 }

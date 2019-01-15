@@ -80,12 +80,11 @@ let last;
 
   function loadMap(attempts) {
     const loaded = checkDataAcquired();
-    const msg = document.getElementById("message");
     if (loaded) {
       setTimeout(function() {
+        document.getElementById('message').className = "hide";
         document.getElementById('auth').className = "hide";
-        document.querySelector('main').className = "show";
-        msg.innerHTML = "Welcome to the world.";
+        document.getElementById('canvas').className = "show centered";
         main(); // Start the cycle
         input.listener(); // Begin movement listeners
         input.clickListener();

@@ -30,12 +30,13 @@ export let examine_menu_vertices = [
 export const OVERLAYS = {
   None: 0,
   Settings: 1,
-  Inventory: 2
+  Help: 2,
+  Inventory: 7
 };
 export let overlay = OVERLAYS.None;
 
 // Small windows means smaller canvas.
-if (window.innerWidth < 500) {
+if (window.innerWidth < 600 || window.innerHeight < 600) {
   canvas.width = 330;
   canvas.height = 290;
 }
@@ -48,6 +49,9 @@ export function draw() {
 
   if (overlay == OVERLAYS.Settings) {
     drawSettings(canvas_width, canvas_height);
+  }
+  else if (overlay == OVERLAYS.Help) {
+    drawHelp(canvas_width, canvas_height);
   }
   else {
     drawTiles(canvas_width, canvas_height);
@@ -226,20 +230,49 @@ function drawSettings(canvas_width, canvas_height) {
   drawOverlay(canvas_width, canvas_height);
   ctx.fillStyle = "black";
   ctx.textAlign = "start";
+
+  ctx.font = "bold 24pt Arial";
+  ctx.fillText("Settings",
+  canvas_width / 4 - 25, 40
+  );
+
   ctx.font = "12pt Arial";
 
   // Show player names
   ctx.fillText(
     "Show Player Names: " + (settings.settings.player_names ? "On" : "Off"),
-    canvas_width / 4 + 5,
-    62
+    canvas_width / 4 - 24,
+    70
   );
 
   // Show current coordinates
   ctx.fillText(
     "Show Coordinates: " + (settings.settings.coordinates ? "On" : "Off"),
-    canvas_width / 4 + 5,
-    85
+    canvas_width / 4 - 24,
+    95
+  );
+}
+
+function drawHelp(canvas_width, canvas_height) {
+  drawOverlay(canvas_width, canvas_height);
+
+  ctx.fillStyle = "black";
+  ctx.textAlign = "start";
+
+  ctx.font = "bold 24pt Arial";
+  ctx.fillText("Helpful Hints",
+  canvas_width / 4 - 25, 40
+  );
+
+  ctx.font = "12pt Arial";
+  ctx.fillText("Movement: WASD, Arrows, or click",
+    canvas_width / 4 - 24, 70
+  );
+  ctx.fillText("Examine: Q or Right-click",
+    canvas_width / 4 - 24, 95
+  );
+  ctx.fillText("Use Object: E or Left-click",
+    canvas_width / 4 - 24, 120
   );
 }
 
@@ -248,6 +281,6 @@ function drawMapName(canvas_height) {
   ctx.textAlign = "start";
   ctx.font = "bold 12pt Arial";
   ctx.fillText(player.current_map_name,
-    5, canvas_height + 12
+    5, canvas_height + 11
   );
 }
