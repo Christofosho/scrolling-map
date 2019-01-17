@@ -61,7 +61,9 @@ export function draw() {
     if (charsheet.complete) {
       drawPlayer(
         map.border_size, map.border_size,
-        player.dir, player.username, player.shirt);
+        player.dir, player.username,
+        player.shirt, player.hair
+      );
     }
     else {
       charsheet.addEventListener('load', drawPlayer);
@@ -116,10 +118,10 @@ function drawTile(tile, x, y) {
   ctx.closePath();
 }
 
-function drawPlayer(x_, y_, direction, username, shirt) {
+function drawPlayer(x_, y_, direction, username, shirt, hair) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(charsheet,
-    direction * map.tile_buffer,
+    (direction + hair) * map.tile_buffer,
     shirt * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
     x_ * map.tile_buffer, y_ * map.tile_buffer,
@@ -131,10 +133,16 @@ function drawPlayer(x_, y_, direction, username, shirt) {
     ctx.font = "10pt Arial";
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 1;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
     ctx.fillText(username,
       x_ * map.tile_buffer + (map.tile_buffer / 2),
-      y_ * map.tile_buffer - 2
+      y_ * map.tile_buffer - 5
     );
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowBlur = 0;
   }
 }
 
@@ -162,7 +170,8 @@ function drawOthers() {
         drawPlayer(x + map.border_size, y + map.border_size,
           game.all_users[u].direction,
           game.all_users[u].username,
-          game.all_users[u].shirt
+          game.all_users[u].shirt,
+          game.all_users[u].hair
         )
       }
     }

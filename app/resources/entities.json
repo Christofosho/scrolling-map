@@ -83,5 +83,13 @@
     "blocking": 1,
     "interact": "rest",
     "examine": "It's a bed. I can sleep on this."
+  },
+  {
+    "entity_id": 12,
+    "type": "object",
+    "name": "Bedside Table",
+    "blocking": 1,
+    "interact": "hair",
+    "examine": "It's a table. A hair bow is on top."
   }
 ]

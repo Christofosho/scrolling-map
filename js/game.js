@@ -113,7 +113,7 @@ let last;
     data = JSON.parse(data);
     [player.username, [player.cx, player.cy, player.dir],
       [player.current_map, player.current_map_name],
-      player.shirt, entities, settings.settings,
+      player.shirt, player.hair, entities, settings.settings,
       [map.tile_buffer, map.border_size]
     ] = data;
     if (draw.canvas.width < 450) {
@@ -144,9 +144,22 @@ let last;
 
   // Updates all players
   socket.on('update_all', function (data) {
-    all_users = JSON.parse(data);
-    player.shirt = player.username ?
-      all_users[player.username].shirt : 0;
+    data = JSON.parse(data);
+    if (data.username == player.username) {
+      player.shirt = data.shirt;
+      player.hair = data.hair;
+    }
+    else {
+      all_users[data.username] = data;
+    }
+  });
+
+  // Remove player from users data
+  socket.on('remove_user', function (data) {
+    data = JSON.parse(data);
+    if (data.username) {
+      delete all_users[data.username];
+    }
   });
 
   socket.on('failure', function (data) {

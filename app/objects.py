@@ -65,11 +65,18 @@ def determine_interaction(socket, owner, obj, obj_x, obj_y):
     if interaction == "replace":
         replace_object(socket, owner, obj, obj_x, obj_y)
 
-    # Dresser
+    # Dresser, ...
     elif interaction == "change":
         owner.shirt += 1
         if owner.shirt > SHIRTS[-1]:
             owner.shirt = 0
+        database.save_user(owner)
+
+    # Bedside Table, ...
+    elif interaction == "hair":
+        # 0: no bow
+        # 4: bow
+        owner.hair = 4 if owner.hair == 0 else 0
         database.save_user(owner)
 
     # Bed, ...

@@ -10,6 +10,7 @@ class User(db.Model):
   y = db.Column(db.Integer, nullable=False)
 
   shirt = db.Column(db.Integer, nullable=False)
+  hair = db.Column(db.Integer, nullable=False)
 
   map_id = db.Column(db.String(80), nullable=False)
   last_login = db.Column(db.Integer, nullable=False)

@@ -13,3 +13,4 @@ export let current_map = [];
 export let current_map_name = "";
 
 export let shirt = 0;
+export let hair = 0;

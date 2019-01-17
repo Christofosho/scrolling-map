@@ -38,7 +38,7 @@ class Handler:
 
     self.users[username] = Player(
       user.uid, username, user.x, user.y,
-      user.map_id, user.shirt,
+      user.map_id, user.shirt, user.hair,
       request.sid, # Store SID to track session.
       settings=user.settings,
       direction=0, bag=[], last_action=last_action
@@ -46,7 +46,7 @@ class Handler:
 
     print ("User " + username + " has connected.")
 
-    sender.update_all_players(socket, self.users)
+    sender.update_all_players(socket, self.users[username], self.users)
     sender.user_authenticated(request, username, True)
 
   """ send_init_data(username)
@@ -59,7 +59,7 @@ class Handler:
         username,
         [user.x, user.y, 0],
         [MAPS[user.map_id], user.map_id],
-        user.shirt, ENTITIES,
+        user.shirt, user.hair, ENTITIES,
         user.settings,
         [constants.TILE_BUFFER, constants.BORDER_TILES]
       ]
@@ -101,7 +101,6 @@ class Handler:
 
       if obj:
         objects.determine_interaction(socket, owner, obj, obj_x, obj_y)
-        sender.update_all_players(socket, self.users)
         action_occurred = True
 
     ## Move
@@ -117,9 +116,9 @@ class Handler:
         sender.send_map_data(socket, self.users)
 
       sender.send_movement(request, owner)
-      sender.update_all_players(socket, self.users)
 
     if action_occurred:
+      sender.update_all_players(socket, owner, self.users)
       owner.last_action = int(time.time() * 1000) # Milliseconds
 
   """ store_settings(data)
@@ -149,9 +148,12 @@ class Handler:
     uname_to_sid = {u.current_sid: u.username
                     for u in self.users.values()
                     if u.current_sid == request.sid}
+    u = ""
     if request.sid in uname_to_sid.keys():
       u = uname_to_sid.get(request.sid)
       database.save_user(self.users.get(u))
       del self.users[u]
       print ("User " + u + " has disconnected.")
-    sender.update_all_players(socket, self.users)
+
+    if u:
+      sender.send_logout(socket, u, self.users)
