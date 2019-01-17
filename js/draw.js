@@ -59,7 +59,9 @@ export function draw() {
 
     // Fill the local character tile
     if (charsheet.complete) {
-      drawPlayer(map.border_size, map.border_size, player.dir, player.username);
+      drawPlayer(
+        map.border_size, map.border_size,
+        player.dir, player.username, player.shirt);
     }
     else {
       charsheet.addEventListener('load', drawPlayer);
@@ -114,11 +116,11 @@ function drawTile(tile, x, y) {
   ctx.closePath();
 }
 
-function drawPlayer(x_, y_, direction, username) {
+function drawPlayer(x_, y_, direction, username, shirt) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(charsheet,
     direction * map.tile_buffer,
-    player.shirt * map.tile_buffer,
+    shirt * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
     x_ * map.tile_buffer, y_ * map.tile_buffer,
     map.tile_buffer, map.tile_buffer
@@ -159,7 +161,8 @@ function drawOthers() {
         // Fill the character tile
         drawPlayer(x + map.border_size, y + map.border_size,
           game.all_users[u].direction,
-          game.all_users[u].username
+          game.all_users[u].username,
+          game.all_users[u].shirt
         )
       }
     }
