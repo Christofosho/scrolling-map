@@ -11,3 +11,5 @@ export let dir = 0;
 
 export let current_map = [];
 export let current_map_name = "";
+
+export let shirt = 0;

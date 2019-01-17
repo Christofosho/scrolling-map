@@ -33,7 +33,8 @@ def insert_user(username, last_action):
     username=username,
     x=DEFAULT_X, y=DEFAULT_Y,
     map_id=DEFAULT_MAP,
-    last_login=last_action
+    last_login=last_action,
+    shirt=0
   )
   user.settings = {k:v[0] for k,v in SETTINGS.items()}
   db.session.add(user)
@@ -55,6 +56,7 @@ def save_user(user):
     db_user.map_id = user.map_id
     db_user.last_login = user.last_action
     db_user.settings = user.settings
+    db_user.shirt = user.shirt
     db.session.commit()
 
   except Exception as e:

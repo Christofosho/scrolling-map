@@ -65,7 +65,7 @@
     "type": "object",
     "name": "Dresser",
     "blocking": 1,
-    "interact": "clothing",
+    "interact": "change",
     "examine": "It's a dresser. It holds clothes."
   },
   {

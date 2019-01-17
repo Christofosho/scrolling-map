@@ -37,7 +37,8 @@ class Handler:
       user = database.insert_user(username, last_action)
 
     self.users[username] = Player(
-      user.uid, username, user.x, user.y, user.map_id,
+      user.uid, username, user.x, user.y,
+      user.map_id, user.shirt,
       request.sid, # Store SID to track session.
       settings=user.settings,
       direction=0, bag=[], last_action=last_action
@@ -58,7 +59,7 @@ class Handler:
         username,
         [user.x, user.y, 0],
         [MAPS[user.map_id], user.map_id],
-        ENTITIES,
+        user.shirt, ENTITIES,
         user.settings,
         [constants.TILE_BUFFER, constants.BORDER_TILES]
       ]
@@ -100,6 +101,8 @@ class Handler:
 
       if obj:
         objects.determine_interaction(socket, owner, obj, obj_x, obj_y)
+        sender.update_all_players(socket, self.users)
+        action_occurred = True
 
     ## Move
     elif action in constants.MOVEMENTS:

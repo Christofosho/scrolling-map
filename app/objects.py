@@ -1,9 +1,9 @@
 ### objects.py
 
 from app import sender
+from app import database
 from app.definitions import MAPS, ENTITIES
-from app.constants import OFFSET_LEFT, OFFSET_RIGHT
-from app.constants import OFFSET_UP, OFFSET_DOWN
+from app.constants import OFFSET_LEFT, OFFSET_RIGHT, OFFSET_UP, OFFSET_DOWN, SHIRTS
 
 """ check_object(x, y, dir, map)
 
@@ -59,9 +59,22 @@ def determine_interaction(socket, owner, obj, obj_x, obj_y):
         # Object has no interaction method.
         return
         
-    # Handle various interaction types.
+    ## Handle various interaction types.
+
+    # Doors, ...
     if interaction == "replace":
         replace_object(socket, owner, obj, obj_x, obj_y)
+
+    # Dresser
+    elif interaction == "change":
+        owner.shirt += 1
+        if owner.shirt > SHIRTS[-1]:
+            owner.shirt = 0
+        database.save_user(owner)
+
+    # Bed, ...
+    elif interaction == "regenerate":
+        pass
 
 def replace_object(socket, owner, obj, obj_x, obj_y):
     replace = obj.get("related_entity_id", None)

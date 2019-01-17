@@ -29,23 +29,24 @@ def send_initialize_player(request, data):
 def send_object_action(socket, request, tiles):
   socket.emit('tiles', json.dumps(tiles), room=request.sid)
 
-""" update_all_players(socket, users_data)
+""" update_all_players(socket, users)
 
   In:
     socket: obj (socket object),
-    users_data: dict (all user data)
+    users: dict (all user data)
 
 """
-def update_all_players(socket, users_data):
-  # Only need to send x, y, direction, username.
-  for user in users_data.values():
+def update_all_players(socket, users):
+  # Only need to send x, y, direction, username, shirt.
+  for user in users.values():
     socket.emit('update_all', json.dumps(
     {u: {
       'cx': d.x,
       'cy': d.y,
       'direction': d.direction,
-      'username': d.username
-    } for u, d in users_data.items()
+      'username': d.username,
+      'shirt': d.shirt
+    } for u, d in users.items()
     if d.map_id == user.map_id}
     ), room=user.current_sid)
 

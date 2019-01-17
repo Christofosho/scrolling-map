@@ -117,7 +117,8 @@ function drawTile(tile, x, y) {
 function drawPlayer(x_, y_, direction, username) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(charsheet,
-    direction * map.tile_buffer, 0,
+    direction * map.tile_buffer,
+    player.shirt * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
     x_ * map.tile_buffer, y_ * map.tile_buffer,
     map.tile_buffer, map.tile_buffer
