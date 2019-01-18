@@ -61,7 +61,17 @@ class Handler:
         [MAPS[user.map_id], user.map_id],
         user.shirt, user.hair, ENTITIES,
         user.settings,
-        [constants.TILE_BUFFER, constants.BORDER_TILES]
+        [constants.TILE_BUFFER, constants.BORDER_TILES],
+        { u.username: {
+            'username': u.username,
+            'cx': u.x,
+            'cy': u.y,
+            'direction': u.direction,
+            'shirt': u.shirt,
+            'hair': u.hair
+          } for u in self.users.values()
+          if u.map_id == user.map_id
+        }
       ]
       sender.send_initialize_player(request, data)
 
@@ -114,6 +124,7 @@ class Handler:
 
       if movement.check_for_portal(owner):
         sender.send_map_data(socket, self.users)
+        sender.update_all_players(socket, owner, self.users, transition=True)
 
       sender.send_movement(request, owner)
 

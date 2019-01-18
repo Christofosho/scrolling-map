@@ -114,7 +114,8 @@ let last;
     [player.username, [player.cx, player.cy, player.dir],
       [player.current_map, player.current_map_name],
       player.shirt, player.hair, entities, settings.settings,
-      [map.tile_buffer, map.border_size]
+      [map.tile_buffer, map.border_size],
+      all_users
     ] = data;
     if (draw.canvas.width < 450) {
       map.border_size = 4;
@@ -142,8 +143,8 @@ let last;
       doMove(data);
   });
 
-  // Updates all players
-  socket.on('update_all', function (data) {
+  // Updates specific player's data
+  socket.on('update_player', function (data) {
     data = JSON.parse(data);
     if (data.username == player.username) {
       player.shirt = data.shirt;

@@ -126,7 +126,7 @@ function drawPlayer(x_, y_, direction, username, shirt, hair) {
     map.tile_buffer, map.tile_buffer,
     x_ * map.tile_buffer, y_ * map.tile_buffer,
     map.tile_buffer, map.tile_buffer
-  )
+  );
 
   if (settings.settings.player_names) {
     ctx.fillStyle = "black";
