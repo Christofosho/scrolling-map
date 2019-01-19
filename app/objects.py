@@ -3,7 +3,8 @@
 from app import sender
 from app import database
 from app.definitions import MAPS, ENTITIES
-from app.constants import OFFSET_LEFT, OFFSET_RIGHT, OFFSET_UP, OFFSET_DOWN, SHIRTS
+from app.constants import OFFSET_LEFT, OFFSET_RIGHT, OFFSET_UP, OFFSET_DOWN
+from app.constants import HAIR_ACCESSORY, SHIRTS
 
 """ check_object(x, y, dir, map)
 
@@ -73,10 +74,12 @@ def determine_interaction(socket, owner, obj, obj_x, obj_y):
         database.save_user(owner)
 
     # Bedside Table, ...
-    elif interaction == "hair":
-        # 0: no bow
-        # 4: bow
-        owner.hair = 4 if owner.hair == 0 else 0
+    elif interaction == "hairaccessory":
+        # 0: none
+        # 1: bow
+        owner.hair_accessory += 1
+        if owner.hair_accessory > HAIR_ACCESSORY[-1]:
+            owner.hair_accessory = 0
         database.save_user(owner)
 
     # Bed, ...

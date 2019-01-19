@@ -38,29 +38,13 @@ def send_object_action(socket, request, tiles):
 """
 def update_all_players(socket, owner, users, transition=False):
   # Only need to send x, y, direction, username, shirt.
-  data = {
-    'username': owner.username,
-    'cx': owner.x,
-    'cy': owner.y,
-    'direction': owner.direction,
-    'shirt': owner.shirt,
-    'hair': owner.hair
-  }
+  data = owner.getAllData()
 
   for user in users.values():
     if user.map_id == owner.map_id:
       socket.emit('update_player', json.dumps(data), room=user.current_sid)
       if transition:
-        socket.emit('update_player', json.dumps(
-          {
-            'username': user.username,
-            'cx': user.x,
-            'cy': user.y,
-            'direction': user.direction,
-            'shirt': user.shirt,
-            'hair': user.hair
-          }
-        ), room=owner.current_sid)
+        socket.emit('update_player', json.dumps(user.getAllData()), room=owner.current_sid)
     else:
       socket.emit('remove_user',
         json.dumps({'username': owner.username}), room=user.current_sid)
@@ -98,4 +82,4 @@ def send_movement(request, owner):
   }), room=request.sid)
 
 def send_logout(request, username, users):
-  emit('remove_user', json.dumps({'username': username}));
+  emit('remove_user', json.dumps({'username': username}))

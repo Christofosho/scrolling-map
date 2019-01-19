@@ -32,22 +32,14 @@ export let object_name = "";
 function doMove(movement) {
   player.cx = movement.cx;
   player.cy = movement.cy;
-  player.dir = movement.direction;
+  player.direction = movement.direction;
 }
 
 /* Main game loop and socket listeners */
 let last;
 (function () {
   function main( timestamp ) {
-    if (!last) {
-      last = timestamp
-      draw.draw();
-    }
-    else {
-      if (timestamp - last > 100) {
-        draw.draw();
-      }
-    }
+    draw.draw();
     requestAnimationFrame( main );
   }
 
@@ -111,9 +103,11 @@ let last;
   // Recieves and populates initial data.
   socket.on('init_data', function (data) {
     data = JSON.parse(data);
-    [player.username, [player.cx, player.cy, player.dir],
+    [player.username, [player.cx, player.cy, player.direction],
       [player.current_map, player.current_map_name],
-      player.shirt, player.hair, entities, settings.settings,
+      [player.shirt, player.hair, player.skin, player.eyes,
+        player.pants, player.shoes, player.hair_accessory],
+      entities, settings.settings,
       [map.tile_buffer, map.border_size],
       all_users
     ] = data;
@@ -149,6 +143,11 @@ let last;
     if (data.username == player.username) {
       player.shirt = data.shirt;
       player.hair = data.hair;
+      player.skin = data.skin;
+      player.eyes = data.eyes;
+      player.pants = data.pants;
+      player.shoes = data.shoes;
+      player.hair_accessory = data.hair_accessory;
     }
     else {
       all_users[data.username] = data;

@@ -89,7 +89,7 @@
     "type": "object",
     "name": "Bedside Table",
     "blocking": 1,
-    "interact": "hair",
+    "interact": "hairaccessory",
     "examine": "It's a table. A hair bow is on top."
   }
 ]

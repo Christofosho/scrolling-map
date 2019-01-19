@@ -123,7 +123,7 @@ function clickAdjacentTile(click_x, click_y, mid_low, mid_high) {
     [mid_low, mid_high, mid_high, mid_low], // x values
     [mid_low - map.tile_buffer, mid_low - map.tile_buffer, mid_low, mid_low], // y values
     click_x, click_y)) {
-    if (player.dir == 1 && map.containsObject(player.cx, player.cy-1)) {
+    if (player.direction == 1 && map.containsObject(player.cx, player.cy-1)) {
       sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
     else {
@@ -137,7 +137,7 @@ function clickAdjacentTile(click_x, click_y, mid_low, mid_high) {
     [mid_low, mid_low, mid_high, mid_high], // x values
     [mid_high, mid_high + map.tile_buffer, mid_high + map.tile_buffer, mid_high], // y values
     click_x, click_y)) {
-    if (player.dir == 0 && map.containsObject(player.cx, player.cy+1)) {
+    if (player.direction == 0 && map.containsObject(player.cx, player.cy+1)) {
       sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
     else {
@@ -151,7 +151,7 @@ function clickAdjacentTile(click_x, click_y, mid_low, mid_high) {
     [mid_low - map.tile_buffer, mid_low, mid_low, mid_low - map.tile_buffer], // x values
     [mid_low, mid_low, mid_high, mid_high], // y values
     click_x, click_y)) {
-    if (player.dir == 3 && map.containsObject(player.cx-1, player.cy)) {
+    if (player.direction == 3 && map.containsObject(player.cx-1, player.cy)) {
       sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
     else {
@@ -165,7 +165,7 @@ function clickAdjacentTile(click_x, click_y, mid_low, mid_high) {
     [mid_high, mid_high + map.tile_buffer, mid_high + map.tile_buffer, mid_high], // x values
     [mid_low, mid_low, mid_high, mid_high], // y values
     click_x, click_y)) {
-    if (player.dir == 2 && map.containsObject(player.cx+1, player.cy)) {
+    if (player.direction == 2 && map.containsObject(player.cx+1, player.cy)) {
       sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
     }
     else {

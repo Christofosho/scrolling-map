@@ -11,6 +11,11 @@ class User(db.Model):
 
   shirt = db.Column(db.Integer, nullable=False)
   hair = db.Column(db.Integer, nullable=False)
+  skin = db.Column(db.Integer, nullable=False)
+  eyes = db.Column(db.Integer, nullable=False)
+  pants = db.Column(db.Integer, nullable=False)
+  shoes = db.Column(db.Integer, nullable=False)
+  hair_accessory = db.Column(db.Integer, nullable=False)
 
   map_id = db.Column(db.String(80), nullable=False)
   last_login = db.Column(db.Integer, nullable=False)

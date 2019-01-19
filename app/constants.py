@@ -59,3 +59,27 @@ SETTINGS = { # Default first
 SHIRTS = [
   0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 ]
+
+HAIR = [
+  0
+]
+
+SKIN = [
+  0
+]
+
+EYES = [
+  0
+]
+
+PANTS = [
+  0
+]
+
+SHOES = [
+  0
+]
+
+HAIR_ACCESSORY = [
+  0, 1
+]

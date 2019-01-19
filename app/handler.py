@@ -38,7 +38,8 @@ class Handler:
 
     self.users[username] = Player(
       user.uid, username, user.x, user.y,
-      user.map_id, user.shirt, user.hair,
+      user.map_id, user.shirt, user.hair, user.skin,
+      user.eyes, user.pants, user.shoes, user.hair_accessory,
       request.sid, # Store SID to track session.
       settings=user.settings,
       direction=0, bag=[], last_action=last_action
@@ -59,8 +60,9 @@ class Handler:
         username,
         [user.x, user.y, 0],
         [MAPS[user.map_id], user.map_id],
-        user.shirt, user.hair, ENTITIES,
-        user.settings,
+        [user.shirt, user.hair, user.skin, user.eyes,
+          user.pants, user.shoes, user.hair_accessory
+        ], ENTITIES, user.settings,
         [constants.TILE_BUFFER, constants.BORDER_TILES],
         { u.username: {
             'username': u.username,
@@ -68,7 +70,12 @@ class Handler:
             'cy': u.y,
             'direction': u.direction,
             'shirt': u.shirt,
-            'hair': u.hair
+            'hair': u.hair,
+            'skin': u.skin,
+            'eyes': u.eyes,
+            'pants': u.pants,
+            'shoes': u.shoes,
+            'hair_accessory': u.hair_accessory
           } for u in self.users.values()
           if u.map_id == user.map_id
         }
@@ -124,7 +131,6 @@ class Handler:
 
       if movement.check_for_portal(owner):
         sender.send_map_data(socket, self.users)
-        sender.update_all_players(socket, owner, self.users, transition=True)
 
       sender.send_movement(request, owner)
 

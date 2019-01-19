@@ -15,7 +15,7 @@ const tilesheet = new Image();
 tilesheet.src = "static/tilesheet.png";
 
 const charsheet = new Image();
-charsheet.src = "static/charsheet.png";
+charsheet.src = "static/spritesheet.png";
 
 const optionsheet = new Image();
 optionsheet.src = "static/optionsheet.png";
@@ -60,13 +60,13 @@ export function draw() {
     // Fill the local character tile
     if (charsheet.complete) {
       drawPlayer(
-        map.border_size, map.border_size,
-        player.dir, player.username,
-        player.shirt, player.hair
+        map.border_size, map.border_size, player
       );
     }
     else {
-      charsheet.addEventListener('load', drawPlayer);
+      charsheet.addEventListener('load', drawPlayer.bind(
+        map.border_size, map.border_size, player
+      ));
     }
 
     if (game.object_name.length > 0) {
@@ -118,34 +118,6 @@ function drawTile(tile, x, y) {
   ctx.closePath();
 }
 
-function drawPlayer(x_, y_, direction, username, shirt, hair) {
-  ctx.strokeStyle = "transparent";
-  ctx.drawImage(charsheet,
-    (direction + hair) * map.tile_buffer,
-    shirt * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
-  );
-
-  if (settings.settings.player_names) {
-    ctx.fillStyle = "black";
-    ctx.font = "10pt Arial";
-    ctx.textBaseline = "middle";
-    ctx.textAlign = "center";
-    ctx.shadowOffsetX = 1;
-    ctx.shadowOffsetY = 1;
-    ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
-    ctx.fillText(username,
-      x_ * map.tile_buffer + (map.tile_buffer / 2),
-      y_ * map.tile_buffer - 5
-    );
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowBlur = 0;
-  }
-}
-
 function drawImage(tile, x, y) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(tilesheet,
@@ -155,6 +127,98 @@ function drawImage(tile, x, y) {
     x, y,
     map.tile_buffer, map.tile_buffer
   );
+}
+
+function drawPlayer(x_, y_, p) {
+  ctx.strokeStyle = "transparent";
+
+  // Used to go horizontally to the next
+  // player portion on the spritesheet.
+  let y_offset = 4;
+
+  // Shirt
+  ctx.drawImage(charsheet,
+    (p.direction) * map.tile_buffer,
+    p.shirt * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer,
+    x_ * map.tile_buffer, y_ * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer
+  );
+
+  // Hair
+  ctx.drawImage(charsheet,
+    (p.direction + y_offset) * map.tile_buffer,
+    p.hair * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer,
+    x_ * map.tile_buffer, y_ * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer
+  );
+
+  y_offset += 4;
+
+  // Skin
+  ctx.drawImage(charsheet,
+    (p.direction + y_offset) * map.tile_buffer,
+    p.skin * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer,
+    x_ * map.tile_buffer, y_ * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer
+  );
+
+  y_offset += 4;
+
+  // Eyes
+  ctx.drawImage(charsheet,
+    (p.direction + y_offset) * map.tile_buffer,
+    p.eyes * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer,
+    x_ * map.tile_buffer, y_ * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer
+  );
+
+  y_offset += 4;
+
+  // Pants
+  ctx.drawImage(charsheet,
+    (p.direction + y_offset) * map.tile_buffer,
+    p.pants * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer,
+    x_ * map.tile_buffer, y_ * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer
+  );
+
+  y_offset += 4;
+
+  // Shoes
+  ctx.drawImage(charsheet,
+    (p.direction + y_offset) * map.tile_buffer,
+    p.shoes * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer,
+    x_ * map.tile_buffer, y_ * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer
+  );
+
+  y_offset += 4;
+
+  // Hair Accessory
+  ctx.drawImage(charsheet,
+    (p.direction + y_offset) * map.tile_buffer,
+    p.hair_accessory * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer,
+    x_ * map.tile_buffer, y_ * map.tile_buffer,
+    map.tile_buffer, map.tile_buffer
+  );
+
+  if (settings.settings.player_names) {
+    ctx.fillStyle = "black";
+    ctx.font = "10pt Merriweather Sans";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.fillText(p.username,
+      x_ * map.tile_buffer + (map.tile_buffer / 2),
+      y_ * map.tile_buffer - 5
+    );
+  }
 }
 
 function drawOthers() {
@@ -167,11 +231,9 @@ function drawOthers() {
       if (x >= -map.border_size && x <= map.border_size
         && y >= -map.border_size && y <= map.border_size) {
         // Fill the character tile
-        drawPlayer(x + map.border_size, y + map.border_size,
-          game.all_users[u].direction,
-          game.all_users[u].username,
-          game.all_users[u].shirt,
-          game.all_users[u].hair
+        drawPlayer(
+          x + map.border_size, y + map.border_size,
+          game.all_users[u]
         )
       }
     }
@@ -226,7 +288,7 @@ function drawCoordinates(canvas_width, canvas_height) {
   ctx.fillStyle = "white";
   ctx.textAlign = "end";
   ctx.fillRect(0, canvas_height, canvas_width, 20);
-  ctx.font = "12pt Arial";
+  ctx.font = "12pt Merriweather Sans";
   ctx.fillStyle = "black";
   ctx.fillText(
     "(" + player.cx + ", " + player.cy + ")",
@@ -244,12 +306,12 @@ function drawSettings(canvas_width, canvas_height) {
   ctx.fillStyle = "black";
   ctx.textAlign = "start";
 
-  ctx.font = "bold 24pt Arial";
+  ctx.font = "bold 24pt Merriweather Sans";
   ctx.fillText("Settings",
   canvas_width / 4 - 25, 40
   );
 
-  ctx.font = "12pt Arial";
+  ctx.font = "12pt Merriweather Sans";
 
   // Show player names
   ctx.fillText(
@@ -272,12 +334,12 @@ function drawHelp(canvas_width, canvas_height) {
   ctx.fillStyle = "black";
   ctx.textAlign = "start";
 
-  ctx.font = "bold 24pt Arial";
+  ctx.font = "bold 24pt Merriweather Sans";
   ctx.fillText("Helpful Hints",
   canvas_width / 4 - 25, 40
   );
 
-  ctx.font = "12pt Arial";
+  ctx.font = "12pt Merriweather Sans";
   ctx.fillText("Movement: WASD, Arrows, or click",
     canvas_width / 4 - 24, 70
   );
@@ -292,7 +354,7 @@ function drawHelp(canvas_width, canvas_height) {
 function drawMapName(canvas_height) {
   ctx.fillStyle = "black";
   ctx.textAlign = "start";
-  ctx.font = "bold 12pt Arial";
+  ctx.font = "bold 12pt Merriweather Sans";
   ctx.fillText(player.current_map_name,
     5, canvas_height + 11
   );
