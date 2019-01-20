@@ -10,6 +10,8 @@ import * as map from './map';
 /* Initializing */
 export const socket = io.connect('//' + document.domain + ':' + location.port);
 
+let logout = false;
+
 export let all_users = {};
 
 export let entities = [];
@@ -39,6 +41,9 @@ function doMove(movement) {
 let last;
 (function () {
   function main( timestamp ) {
+    if (logout) {
+      return;
+    }
     draw.draw();
     requestAnimationFrame( main );
   }
@@ -74,9 +79,11 @@ let last;
     const loaded = checkDataAcquired();
     if (loaded) {
       setTimeout(function() {
+        document.getElementById("message").innerHTML = "";
         document.getElementById('message').className = "hide";
         document.getElementById('auth').className = "hide";
         document.getElementById('canvas').className = "show centered";
+        logout = false;
         main(); // Start the cycle
         input.listener(); // Begin movement listeners
         input.clickListener();
@@ -159,6 +166,16 @@ let last;
     data = JSON.parse(data);
     if (data.username) {
       delete all_users[data.username];
+    }
+
+    // Logout if self
+    if (data.username == player.username) {
+      logout = true;
+      all_users = {};
+      document.getElementById('message').className = "show";
+      document.getElementById('auth').className = "show";
+      document.getElementById('canvas').className = "hide";
+      input.removeListeners();
     }
   });
 

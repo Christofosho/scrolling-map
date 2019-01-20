@@ -16,6 +16,10 @@ def connect():
   pass
   # handler.handle_connect(socketio, request)
 
+@socketio.on('logout')
+def logout():
+  handler.handle_disconnect(socketio, request)
+
 @socketio.on('disconnect')
 def disconnect():
   handler.handle_disconnect(socketio, request)

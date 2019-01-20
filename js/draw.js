@@ -31,6 +31,7 @@ export const OVERLAYS = {
   None: 0,
   Settings: 1,
   Help: 2,
+  History: 6,
   Inventory: 7
 };
 export let overlay = OVERLAYS.None;

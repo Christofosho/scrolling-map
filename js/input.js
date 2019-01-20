@@ -83,7 +83,7 @@ function checkMenuIconClicked(click_x, click_y, canvas_width) {
   // Click on settings menu icon
   if (polygon_click_test(4,
     [canvas_width, canvas.width, canvas.width, canvas_width], // x values
-    [0, 0, 60, 60], /* y values */ click_x, click_y)) {
+    [0, 0, 59, 59], /* y values */ click_x, click_y)) {
     draw.overlay = draw.overlay != draw.OVERLAYS.Settings ?
       draw.OVERLAYS.Settings : draw.OVERLAYS.None;
   }
@@ -91,17 +91,32 @@ function checkMenuIconClicked(click_x, click_y, canvas_width) {
   // Click help icon
   else if (polygon_click_test(4,
     [canvas_width, canvas.width, canvas.width, canvas_width], // x values
-    [60, 60, 120, 120], /* y values */ click_x, click_y)) {
+    [60, 60, 119, 119], /* y values */ click_x, click_y)) {
     draw.overlay = draw.overlay != draw.OVERLAYS.Help ?
       draw.OVERLAYS.Help : draw.OVERLAYS.None;
+  }
+
+  // Click message history icon
+  else if (polygon_click_test(4,
+    [canvas_width, canvas.width, canvas.width, canvas_width], // x values
+    [300, 300, 359, 359], /* y values */ click_x, click_y)) {
+    draw.overlay = draw.overlay != draw.OVERLAYS.History ?
+      draw.OVERLAYS.History : draw.OVERLAYS.None;
   }
 
   // Click inventory icon
   else if (polygon_click_test(4,
     [canvas_width, canvas.width, canvas.width, canvas_width], // x values
-    [60, 60, 120, 120], /* y values */ click_x, click_y)) {
+    [360, 360, 419, 419], /* y values */ click_x, click_y)) {
     draw.overlay = draw.overlay != draw.OVERLAYS.Inventory ?
       draw.OVERLAYS.Inventory : draw.OVERLAYS.None;
+  }
+
+  // Click logout icon
+  else if (polygon_click_test(4,
+    [canvas_width, canvas.width, canvas.width, canvas_width], // x values
+    [420, 420, 449, 449], /* y values */ click_x, click_y)) {
+    game.socket.emit('logout');
   }
 }
 
@@ -301,4 +316,13 @@ export function clickListener() {
   draw.canvas.addEventListener('touchend', getTouchCoords, { passive: false });
   draw.canvas.addEventListener('contextmenu', setContextMenu);
   draw.canvas.addEventListener('mousemove', handleMouseMovement);
+}
+
+export function removeListeners() {
+  document.removeEventListener('keydown', sendAction);
+  draw.canvas.removeEventListener('mousedown', getClickCoords);
+  draw.canvas.removeEventListener('touchstart', setTouchCoords, { passive: false });
+  draw.canvas.removeEventListener('touchend', getTouchCoords, { passive: false });
+  draw.canvas.removeEventListener('contextmenu', setContextMenu);
+  draw.canvas.removeEventListener('mousemove', handleMouseMovement);
 }
