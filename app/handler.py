@@ -133,7 +133,6 @@ class Handler:
         sender.send_map_data(socket, self.users)
         transition = True
 
-      sender.send_movement(request, owner)
       action_occurred = True
 
     if action_occurred:

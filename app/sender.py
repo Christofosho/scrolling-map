@@ -82,18 +82,3 @@ def send_map_data(socket, users):
   for user in users.values():
     map = MAPS[user.map_id]
     socket.emit('map_data', json.dumps([map, user.map_id]), room=user.current_sid)
-
-""" send_movement(request, owner)
-
-  In:
-    request: obj (request object),
-    owner: dict (user data)
-
-"""
-def send_movement(request, owner):
-  emit('movement_self', json.dumps({
-    'username': owner.username,
-    'cx': owner.x,
-    'cy': owner.y,
-    'direction': owner.direction
-  }), room=request.sid)

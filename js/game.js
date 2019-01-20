@@ -148,6 +148,9 @@ let last;
   socket.on('update_player', function (data) {
     data = JSON.parse(data);
     if (data.username == player.username) {
+      player.cx = data.cx;
+      player.cy = data.cy;
+      player.direction = data.direction;
       player.shirt = data.shirt;
       player.hair = data.hair;
       player.skin = data.skin;
