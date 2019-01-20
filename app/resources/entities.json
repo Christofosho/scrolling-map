@@ -66,7 +66,7 @@
     "name": "Dresser",
     "blocking": 1,
     "interact": "change",
-    "examine": "It's a dresser. It holds clothes."
+    "examine": "It's a dresser. I can change my shirt here."
   },
   {
     "entity_id": 10,
@@ -90,6 +90,28 @@
     "name": "Bedside Table",
     "blocking": 1,
     "interact": "hairaccessory",
-    "examine": "It's a table. A hair bow is on top."
+    "examine": "It's a table. There are some hair accessories on top."
+  },
+  {
+    "entity_id": 13,
+    "type": "object",
+    "name": "Computer Desk",
+    "blocking": 1,
+    "interact": "soon",
+    "examine": "It's a computer desk, without a computer on it."
+  },
+  {
+    "entity_id": 14,
+    "type": "object",
+    "name": "Computer Desk",
+    "blocking": 1,
+    "examine": "It's a computer desk, without a computer on it."
+  },
+  {
+    "entity_id": 15,
+    "type": "object",
+    "name": "Computer Chair",
+    "blocking": 1,
+    "examine": "It looks like a pretty comfy chair."
   }
 ]
