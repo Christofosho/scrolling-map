@@ -95,6 +95,7 @@ class Handler:
   """
   def distribute(self, socket, request, data):
     action_occurred = False
+    transition = False
 
     action = data.get('action')
     owner = self.users.get(data.get('username'))
@@ -127,15 +128,16 @@ class Handler:
       if moved:
         owner.x = cx
         owner.y = cy
-        action_occurred = True
 
       if movement.check_for_portal(owner):
         sender.send_map_data(socket, self.users)
+        transition = True
 
       sender.send_movement(request, owner)
+      action_occurred = True
 
     if action_occurred:
-      sender.update_all_players(socket, owner, self.users)
+      sender.update_all_players(socket, owner, self.users, transition)
       owner.last_action = int(time.time() * 1000) # Milliseconds
 
   """ store_settings(data)
@@ -162,15 +164,15 @@ class Handler:
 
   """
   def handle_disconnect(self, socket, request):
-    uname_to_sid = {u.current_sid: u.username
+    uname_to_sid = {u.current_sid: u
                     for u in self.users.values()
                     if u.current_sid == request.sid}
-    u = ""
+    u = {}
     if request.sid in uname_to_sid.keys():
       u = uname_to_sid.get(request.sid)
-      database.save_user(self.users.get(u))
-      del self.users[u]
-      print ("User " + u + " has disconnected.")
+      database.save_user(self.users.get(u.username))
+      del self.users[u.username]
+      print("User " + u.username + " has disconnected.")
 
     if u:
-      sender.send_logout(socket, u, self.users)
+      sender.update_all_players(socket, u, self.users, True)

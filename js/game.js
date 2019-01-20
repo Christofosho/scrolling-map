@@ -68,7 +68,7 @@ let last;
         socket.emit('retrieve_init_data', JSON.stringify({
           'username': data.username
         }));
-      }, 600);
+      }, 300);
     }
     else {
       msg.innerHTML = "Authentication failed. Please try again.";
@@ -87,7 +87,7 @@ let last;
         main(); // Start the cycle
         input.listener(); // Begin movement listeners
         input.clickListener();
-      }, 1000);
+      }, 300);
       return; // Do not execute the rest of the function.
     }
     attempts++;

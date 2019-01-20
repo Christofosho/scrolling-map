@@ -37,22 +37,39 @@ def send_object_action(socket, request, tiles):
 
 """
 def update_all_players(socket, owner, users, transition=False):
-  # Only need to send x, y, direction, username, shirt.
   data = owner.getAllData()
 
-  for user in users.values():
-    if user.map_id == owner.map_id:
-      socket.emit('update_player', json.dumps(data), room=user.current_sid)
-      if transition:
-        socket.emit('update_player', json.dumps(user.getAllData()), room=owner.current_sid)
-    else:
+  if owner in users.values():
+    for user in users.values():
+
+      # Same map means update.
+      if user.map_id == owner.map_id:
+        socket.emit('update_player',
+          json.dumps(data), room=user.current_sid)
+
+        # Owner is moving to new map, send update to them with user data.
+        if transition:
+          socket.emit('update_player',
+            json.dumps(user.getAllData()), room=owner.current_sid)
+
+      # Different map means remove.
+      else:
+        socket.emit('remove_user',
+          json.dumps({'username': owner.username}), room=user.current_sid)
+        
+        # User is moving to another map or something similar.
+        if transition:
+          socket.emit('remove_user',
+            json.dumps({'username': user.username}), room=owner.current_sid)
+  
+  # Owner doesn't exist. Remove them.
+  else:
+    socket.emit('remove_user',
+      json.dumps({'username': owner.username}), room=owner.current_sid)
+    for user in users.values():
       socket.emit('remove_user',
         json.dumps({'username': owner.username}), room=user.current_sid)
-      
-      # User is moving to another map or something similar
-      if transition:
-        socket.emit('remove_user',
-          json.dumps({'username': user.username}), room=owner.current_sid)
+
 
 """ send_map_data(socket, map_data)
 
@@ -80,6 +97,3 @@ def send_movement(request, owner):
     'cy': owner.y,
     'direction': owner.direction
   }), room=request.sid)
-
-def send_logout(request, username, users):
-  emit('remove_user', json.dumps({'username': username}))
