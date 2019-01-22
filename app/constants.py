@@ -53,7 +53,8 @@ BLOCKING = 1
 ## Settings
 SETTINGS = { # Default first
   'player_names': [True, False],
-  'coordinates': [False, True]
+  'coordinates': [False, True],
+  'zoom': [False, True]
 }
 
 SHIRTS = [

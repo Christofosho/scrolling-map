@@ -10,6 +10,8 @@ export const canvas = document.getElementById('canvas');
 
 const ctx = canvas.getContext('2d');
 
+ctx.imageSmoothingEnabled = false;
+
 // Rows of 10 30x30 tiles.
 const tilesheet = new Image();
 tilesheet.src = "static/tilesheet.png";
@@ -44,8 +46,11 @@ if (window.innerWidth < 600 || window.innerHeight < 600) {
 
 /* DRAWING */
 export function draw() {
-  const canvas_width = canvas.width - 60;
-  const canvas_height = canvas.height - 20;
+  const canvas_width = canvas.width
+    - (settings.settings.zoom ? 90 : 60);
+  const canvas_height = canvas.height
+    - (settings.settings.zoom ? 50 : 20);
+  const border_size = settings.settings.zoom ? 3 : map.border_size;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (overlay == OVERLAYS.Settings) {
@@ -55,18 +60,18 @@ export function draw() {
     drawHelp(canvas_width, canvas_height);
   }
   else {
-    drawTiles(canvas_width, canvas_height);
+    drawTiles(canvas_width, canvas_height, border_size);
     drawOthers();
 
     // Fill the local character tile
     if (charsheet.complete) {
       drawPlayer(
-        map.border_size, map.border_size, player
+        border_size, border_size, player
       );
     }
     else {
       charsheet.addEventListener('load', drawPlayer.bind(
-        map.border_size, map.border_size, player
+        border_size, border_size, player
       ));
     }
 
@@ -86,47 +91,49 @@ export function draw() {
   drawSidePanel();
 }
 
-function drawTiles(canvas_width, canvas_height) {
-  for (let x = 0; x < canvas_width; x += map.tile_buffer) {
-    const curr_x = x/map.tile_buffer+(player.cx-map.border_size);
-    for (let y = 0; y < canvas_height; y += map.tile_buffer) {
-      const tile = player.current_map[y/map.tile_buffer+(player.cy-map.border_size)][curr_x];
+function drawTiles(canvas_width, canvas_height, border_size) {
+  let tile_size = settings.settings.zoom ?
+    map.tile_buffer * 2 : map.tile_buffer;
+  for (let x = 0; x < canvas_width; x += tile_size) {
+    const curr_x = x/tile_size+(player.cx-border_size);
+    for (let y = 0; y < canvas_height; y += tile_size) {
+      const tile = player.current_map[y/tile_size+(player.cy-border_size)][curr_x];
       if (Array.isArray(tile)) {
         for (const def in tile) {
-          drawTile(tile[def], x, y);
+          drawTile(tile[def], x, y, tile_size);
         }
       }
       else {
-        drawTile(tile, x, y);
+        drawTile(tile, x, y, tile_size);
       }
     }
   }
 }
 
-function drawTile(tile, x, y) {
+function drawTile(tile, x, y, tile_size) {
   ctx.beginPath();
   if (tilesheet.complete) {
-    drawImage(tile, x, y);
+    drawImage(tile, x, y, tile_size);
   }
   else {
-    tilesheet.load = drawImage.bind(tile, x, y);
+    tilesheet.load = drawImage.bind(tile, x, y, tile_size);
   }
   ctx.moveTo(x, y);
-  ctx.lineTo(x + map.tile_buffer, y);
+  ctx.lineTo(x + tile_size, y);
   ctx.moveTo(x, y);
-  ctx.lineTo(x, y + map.tile_buffer);
+  ctx.lineTo(x, y + tile_size);
   ctx.stroke();
   ctx.closePath();
 }
 
-function drawImage(tile, x, y) {
+function drawImage(tile, x, y, tile_size) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(tilesheet,
     (tile % 10) * map.tile_buffer,
     Math.floor(tile / 10) * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
     x, y,
-    map.tile_buffer, map.tile_buffer
+    tile_size, tile_size
   );
 }
 
@@ -137,13 +144,17 @@ function drawPlayer(x_, y_, p) {
   // player portion on the spritesheet.
   let y_offset = 4;
 
+  let size = settings.settings.zoom ?
+    map.tile_buffer * 2 : map.tile_buffer;
+  
+
   // Shirt
   ctx.drawImage(charsheet,
     (p.direction) * map.tile_buffer,
     p.shirt * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * size, y_ * size,
+    size, size
   );
 
   // Hair
@@ -151,8 +162,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.hair * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * size, y_ * size,
+    size, size
   );
 
   y_offset += 4;
@@ -162,8 +173,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.skin * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * size, y_ * size,
+    size, size
   );
 
   y_offset += 4;
@@ -173,8 +184,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.eyes * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * size, y_ * size,
+    size, size
   );
 
   y_offset += 4;
@@ -184,8 +195,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.pants * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * size, y_ * size,
+    size, size
   );
 
   y_offset += 4;
@@ -195,8 +206,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.shoes * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * size, y_ * size,
+    size, size
   );
 
   y_offset += 4;
@@ -206,8 +217,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.hair_accessory * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * size, y_ * size,
+    size, size
   );
 
   if (settings.settings.player_names) {
@@ -323,9 +334,18 @@ function drawSettings(canvas_width, canvas_height) {
 
   // Show current coordinates
   ctx.fillText(
-    "Show Coordinates: " + (settings.settings.coordinates ? "On" : "Off"),
+    "Show Coordinates: "
+      + (settings.settings.coordinates ? "On" : "Off"),
     canvas_width / 4 - 24,
     95
+  );
+
+  // Zoom (Far: 14x14, Close: 7 x 7)
+  ctx.fillText(
+    "Zoom: "
+      + (settings.settings.zoom ? "Close" : "Far"),
+    canvas_width / 4 - 24,
+    120
   );
 }
 
