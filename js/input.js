@@ -52,9 +52,14 @@ function determineLeftClick(click_x, click_y) {
     }
   }
 
+  // Message History Scope
+  else if (draw.overlay == draw.OVERLAYS.History) {
+    // Check for message history interaction.
+  }
+
   // Inventory scope
   else if (draw.overlay == draw.OVERLAYS.Inventory) {
-    // Check for inventory interaction here.
+    // Check for inventory interaction.
   }
 
   // Map scope
@@ -88,34 +93,26 @@ function checkMenuIconClicked(click_x, click_y, canvas_width) {
       draw.OVERLAYS.Settings : draw.OVERLAYS.None;
   }
 
-  // Click help icon
-  else if (polygon_click_test(4,
-    [canvas_width, canvas.width, canvas.width, canvas_width], // x values
-    [60, 60, 119, 119], /* y values */ click_x, click_y)) {
-    draw.overlay = draw.overlay != draw.OVERLAYS.Help ?
-      draw.OVERLAYS.Help : draw.OVERLAYS.None;
-  }
-
   // Click message history icon
   else if (polygon_click_test(4,
     [canvas_width, canvas.width, canvas.width, canvas_width], // x values
-    [300, 300, 359, 359], /* y values */ click_x, click_y)) {
-    draw.overlay = draw.overlay != draw.OVERLAYS.History ?
-      draw.OVERLAYS.History : draw.OVERLAYS.None;
+    [60, 60, 119, 119], /* y values */ click_x, click_y)) {
+    draw.overlay = draw.overlay != draw.OVERLAYS.Inventory ?
+      draw.OVERLAYS.Inventory : draw.OVERLAYS.None;
   }
 
   // Click inventory icon
   else if (polygon_click_test(4,
     [canvas_width, canvas.width, canvas.width, canvas_width], // x values
-    [360, 360, 419, 419], /* y values */ click_x, click_y)) {
-    draw.overlay = draw.overlay != draw.OVERLAYS.Inventory ?
-      draw.OVERLAYS.Inventory : draw.OVERLAYS.None;
+    [120, 120, 179, 179], /* y values */ click_x, click_y)) {
+    draw.overlay = draw.overlay != draw.OVERLAYS.History ?
+      draw.OVERLAYS.History : draw.OVERLAYS.None;
   }
 
   // Click logout icon
   else if (polygon_click_test(4,
     [canvas_width, canvas.width, canvas.width, canvas_width], // x values
-    [420, 420, 449, 449], /* y values */ click_x, click_y)) {
+    [canvas.height - 30, canvas.height - 30, canvas.height, canvas.height], /* y values */ click_x, click_y)) {
     game.socket.emit('logout');
   }
 }

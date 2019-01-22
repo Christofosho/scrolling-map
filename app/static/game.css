@@ -19,6 +19,7 @@ body {
 header {
   width: 100vw;
   height: 65px;
+  margin-bottom: 5px;
 }
 
 h1 {

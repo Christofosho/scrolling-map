@@ -30,29 +30,31 @@ export let examine_menu_vertices = [
 export const OVERLAYS = {
   None: 0,
   Settings: 1,
-  Help: 2,
-  History: 6,
-  Inventory: 7
+  History: 2,
+  Inventory: 3
 };
 export let overlay = OVERLAYS.None;
 
 // Small windows means smaller canvas.
 if (window.innerWidth < 600 || window.innerHeight < 600) {
   canvas.width = 330;
-  canvas.height = 290;
+  canvas.height = 300;
 }
 
 /* DRAWING */
 export function draw() {
   const canvas_width = canvas.width - 60;
-  const canvas_height = canvas.height - 20;
+  const canvas_height = canvas.height - 30;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (overlay == OVERLAYS.Settings) {
     drawSettings(canvas_width, canvas_height);
   }
-  else if (overlay == OVERLAYS.Help) {
-    drawHelp(canvas_width, canvas_height);
+  else if (overlay == OVERLAYS.History) {
+    drawHistory(canvas_width, canvas_height);
+  }
+  else if (overlay == OVERLAYS.Inventory) {
+    drawInventory(canvas_width, canvas_height);
   }
   else {
     drawTiles(canvas_width, canvas_height);
@@ -82,7 +84,7 @@ export function draw() {
   if (settings.settings.coordinates) {
     drawCoordinates(canvas_width, canvas_height);
   }
-  drawMapName(canvas_height);
+  drawMapName();
   drawSidePanel();
 }
 
@@ -104,19 +106,21 @@ function drawTiles(canvas_width, canvas_height) {
 }
 
 function drawTile(tile, x, y) {
-  ctx.beginPath();
   if (tilesheet.complete) {
     drawImage(tile, x, y);
   }
   else {
     tilesheet.load = drawImage.bind(tile, x, y);
   }
+  /*
+  ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.lineTo(x + map.tile_buffer, y);
   ctx.moveTo(x, y);
   ctx.lineTo(x, y + map.tile_buffer);
   ctx.stroke();
   ctx.closePath();
+  */
 }
 
 function drawImage(tile, x, y) {
@@ -243,11 +247,37 @@ function drawOthers() {
 
 function drawSidePanel() {
   ctx.strokeStyle = "transparent";
+  
+  // Settings
   ctx.drawImage(optionsheet,
     0, 0,
-    60, 450,
+    60, 60,
     canvas.width - 60, 0,
-    60, 450
+    60, 60
+  );
+
+  // Message History
+  ctx.drawImage(optionsheet,
+    0, 60,
+    60, 60,
+    canvas.width - 60, 60,
+    60, 60
+  );
+
+  // Inventory
+  ctx.drawImage(optionsheet,
+    0, 120,
+    60, 60,
+    canvas.width - 60, 120,
+    60, 60
+  );
+
+  // Logout
+  ctx.drawImage(optionsheet,
+    0, 420,
+    60, 30,
+    canvas.width - 60, canvas.height - 30,
+    60, 30
   );
 }
 
@@ -329,34 +359,20 @@ function drawSettings(canvas_width, canvas_height) {
   );
 }
 
-function drawHelp(canvas_width, canvas_height) {
+function drawHistory(canvas_width, canvas_height) {
   drawOverlay(canvas_width, canvas_height);
-
-  ctx.fillStyle = "black";
-  ctx.textAlign = "start";
-
-  ctx.font = "bold 24pt Merriweather Sans";
-  ctx.fillText("Helpful Hints",
-  canvas_width / 4 - 25, 40
-  );
-
-  ctx.font = "12pt Merriweather Sans";
-  ctx.fillText("Movement: WASD, Arrows, or click",
-    canvas_width / 4 - 24, 70
-  );
-  ctx.fillText("Examine: Q or Right-click",
-    canvas_width / 4 - 24, 95
-  );
-  ctx.fillText("Use Object: E or Left-click",
-    canvas_width / 4 - 24, 120
-  );
 }
 
-function drawMapName(canvas_height) {
+function drawInventory(canvas_width, canvas_height) {
+  drawOverlay(canvas_width, canvas_height);
+}
+
+
+function drawMapName() {
   ctx.fillStyle = "black";
   ctx.textAlign = "start";
   ctx.font = "bold 12pt Merriweather Sans";
   ctx.fillText(player.current_map_name,
-    5, canvas_height + 11
+    5, canvas.height - 10
   );
 }
