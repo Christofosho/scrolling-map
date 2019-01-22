@@ -240,12 +240,18 @@ export function polygon_click_test( nvert, vertx, verty, testx, testy ) {
 
 function setTouchCoords(e) {
   e.preventDefault();
+  e.stopPropagation();
   last_click_x = e.touches[0].clientX - draw.canvas.getBoundingClientRect().left;
   last_click_y = e.touches[0].clientY - draw.canvas.getBoundingClientRect().top;
 }
 
 function getClickCoords(e) {
   e.preventDefault();
+  if (last_click_x > -1 || last_click_y > -1) {
+    last_click_x = 0;
+    last_click_y = 0;
+    return;
+  }
   const click_x = e.offsetX;
   const click_y = e.offsetY;
   if (e.button == 2) {
@@ -258,12 +264,7 @@ function getClickCoords(e) {
 
 function getTouchCoords(e) {
   e.preventDefault();
-  if (last_click_x > -1 || last_click_y > -1) {
-    return;
-  }
-  const click_x = e.touches[0].clientX - draw.canvas.getBoundingClientRect().left;
-  const click_y = e.touches[0].clientY - draw.canvas.getBoundingClientRect().top;
-  determineLeftClick(click_x, click_y);
+  determineLeftClick(last_click_x, last_click_y);
 }
 
 function setContextMenu(e) {
