@@ -39,7 +39,7 @@
   {
     "entity_id": 5,
     "type": "tile",
-    "name": "black",
+    "name": "black_1",
     "blocking": 1
   },
   {
@@ -113,5 +113,17 @@
     "name": "Computer Chair",
     "blocking": 1,
     "examine": "It looks like a pretty comfy chair."
+  },
+  {
+    "entity_id": 16,
+    "type": "tile",
+    "name": "sidewalk_1",
+    "blocking": 0
+  },
+  {
+    "entity_id": 17,
+    "type": "tile",
+    "name": "black_2",
+    "blocking": 0
   }
 ]

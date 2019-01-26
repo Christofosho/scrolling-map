@@ -15,6 +15,36 @@
             "y": 9,
             "related_map": "Your Dormatory Room",
             "related_id": 0
+        },
+        {
+            "portal_id": 2,
+            "x": 9,
+            "y": 25,
+            "related_map": "Campus",
+            "related_id": 4
+        },
+        {
+            "portal_id": 3,
+            "x": 10,
+            "y": 25,
+            "related_map": "Campus",
+            "related_id": 5
+        }
+    ],
+    "Campus": [
+        {
+            "portal_id": 4,
+            "x": 25,
+            "y": 38,
+            "related_map": "Dormatory Hall",
+            "related_id": 2
+        },
+        {
+            "portal_id": 5,
+            "x": 26,
+            "y": 38,
+            "related_map": "Dormatory Hall",
+            "related_id": 3
         }
     ]
 }

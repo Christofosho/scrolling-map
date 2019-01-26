@@ -84,8 +84,8 @@ export function draw() {
   if (settings.settings.coordinates) {
     drawCoordinates(canvas_width, canvas_height);
   }
-  drawMapName();
-  drawSidePanel();
+  drawMapName(canvas_height);
+  drawSidePanel(canvas_width, canvas_height);
 }
 
 function drawTiles(canvas_width, canvas_height) {
@@ -245,8 +245,13 @@ function drawOthers() {
   }
 }
 
-function drawSidePanel() {
+function drawSidePanel(canvas_width, canvas_height) {
   ctx.strokeStyle = "transparent";
+  ctx.fillStyle = "white";
+  ctx.fillRect(
+    canvas_width, 0,
+    60, canvas_height
+  );
   
   // Settings
   ctx.drawImage(optionsheet,
@@ -368,7 +373,9 @@ function drawInventory(canvas_width, canvas_height) {
 }
 
 
-function drawMapName() {
+function drawMapName(canvas_height) {
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, canvas_height, canvas.width, 30);
   ctx.fillStyle = "black";
   ctx.textAlign = "start";
   ctx.font = "bold 12pt Merriweather Sans";
