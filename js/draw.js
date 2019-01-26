@@ -45,7 +45,16 @@ if (window.innerWidth < 600 || window.innerHeight < 600) {
 export function draw() {
   const canvas_width = canvas.width - 60;
   const canvas_height = canvas.height - 30;
+  const tile_buffer = settings.settings.zoom ? map.tile_buffer * 3 : map.tile_buffer;
+  const border_size = settings.settings.zoom ? 2 : map.border_size;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (settings.settings.zoom) {
+    ctx.imageSmoothingEnabled = false;
+  }
+  else {
+    ctx.imageSmoothingEnabled = true;
+  }
 
   if (overlay == OVERLAYS.Settings) {
     drawSettings(canvas_width, canvas_height);
@@ -57,18 +66,18 @@ export function draw() {
     drawInventory(canvas_width, canvas_height);
   }
   else {
-    drawTiles(canvas_width, canvas_height);
-    drawOthers();
+    drawTiles(canvas_width, canvas_height, tile_buffer, border_size);
+    drawOthers(tile_buffer, border_size);
 
     // Fill the local character tile
     if (charsheet.complete) {
       drawPlayer(
-        map.border_size, map.border_size, player
+        border_size, border_size, player, tile_buffer
       );
     }
     else {
       charsheet.addEventListener('load', drawPlayer.bind(
-        map.border_size, map.border_size, player
+        border_size, border_size, player, tile_buffer
       ));
     }
 
@@ -88,29 +97,29 @@ export function draw() {
   drawSidePanel(canvas_width, canvas_height);
 }
 
-function drawTiles(canvas_width, canvas_height) {
-  for (let x = 0; x < canvas_width; x += map.tile_buffer) {
-    const curr_x = x/map.tile_buffer+(player.cx-map.border_size);
-    for (let y = 0; y < canvas_height; y += map.tile_buffer) {
-      const tile = player.current_map[y/map.tile_buffer+(player.cy-map.border_size)][curr_x];
+function drawTiles(canvas_width, canvas_height, tile_buffer, border_size) {
+  for (let x = 0; x < canvas_width; x += tile_buffer) {
+    const curr_x = x/tile_buffer+(player.cx-border_size);
+    for (let y = 0; y < canvas_height; y += tile_buffer) {
+      const tile = player.current_map[y/tile_buffer+(player.cy-border_size)][curr_x];
       if (Array.isArray(tile)) {
         for (const def in tile) {
-          drawTile(tile[def], x, y);
+          drawTile(tile[def], x, y, tile_buffer);
         }
       }
       else {
-        drawTile(tile, x, y);
+        drawTile(tile, x, y, tile_buffer);
       }
     }
   }
 }
 
-function drawTile(tile, x, y) {
+function drawTile(tile, x, y, tile_buffer) {
   if (tilesheet.complete) {
-    drawImage(tile, x, y);
+    drawImage(tile, x, y, tile_buffer);
   }
   else {
-    tilesheet.load = drawImage.bind(tile, x, y);
+    tilesheet.load = drawImage.bind(tile, x, y, tile_buffer);
   }
   /*
   ctx.beginPath();
@@ -123,18 +132,18 @@ function drawTile(tile, x, y) {
   */
 }
 
-function drawImage(tile, x, y) {
+function drawImage(tile, x, y, tile_buffer) {
   ctx.strokeStyle = "transparent";
   ctx.drawImage(tilesheet,
     (tile % 10) * map.tile_buffer,
     Math.floor(tile / 10) * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
     x, y,
-    map.tile_buffer, map.tile_buffer
+    tile_buffer, tile_buffer
   );
 }
 
-function drawPlayer(x_, y_, p) {
+function drawPlayer(x_, y_, p, tile_buffer) {
   ctx.strokeStyle = "transparent";
 
   // Used to go horizontally to the next
@@ -146,8 +155,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction) * map.tile_buffer,
     p.shirt * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * tile_buffer, y_ * tile_buffer,
+    tile_buffer, tile_buffer
   );
 
   // Hair
@@ -155,8 +164,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.hair * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * tile_buffer, y_ * tile_buffer,
+    tile_buffer, tile_buffer
   );
 
   y_offset += 4;
@@ -166,8 +175,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.skin * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * tile_buffer, y_ * tile_buffer,
+    tile_buffer, tile_buffer
   );
 
   y_offset += 4;
@@ -177,8 +186,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.eyes * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * tile_buffer, y_ * tile_buffer,
+    tile_buffer, tile_buffer
   );
 
   y_offset += 4;
@@ -188,8 +197,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.pants * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * tile_buffer, y_ * tile_buffer,
+    tile_buffer, tile_buffer
   );
 
   y_offset += 4;
@@ -199,8 +208,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.shoes * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * tile_buffer, y_ * tile_buffer,
+    tile_buffer, tile_buffer
   );
 
   y_offset += 4;
@@ -210,8 +219,8 @@ function drawPlayer(x_, y_, p) {
     (p.direction + y_offset) * map.tile_buffer,
     p.hair_accessory * map.tile_buffer,
     map.tile_buffer, map.tile_buffer,
-    x_ * map.tile_buffer, y_ * map.tile_buffer,
-    map.tile_buffer, map.tile_buffer
+    x_ * tile_buffer, y_ * tile_buffer,
+    tile_buffer, tile_buffer
   );
 
   if (settings.settings.player_names) {
@@ -220,25 +229,25 @@ function drawPlayer(x_, y_, p) {
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     ctx.fillText(p.username,
-      x_ * map.tile_buffer + (map.tile_buffer / 2),
-      y_ * map.tile_buffer - 5
+      x_ * tile_buffer + (tile_buffer / 2),
+      y_ * tile_buffer - 5
     );
   }
 }
 
-function drawOthers() {
+function drawOthers(tile_buffer, border_size) {
   for (const u in game.all_users) {
     if (u != player.username) {
       const ucx = game.all_users[u].cx;
       const ucy = game.all_users[u].cy;
       const x = ucx - player.cx;
       const y = ucy - player.cy;
-      if (x >= -map.border_size && x <= map.border_size
-        && y >= -map.border_size && y <= map.border_size) {
+      if (x >= -border_size && x <= border_size
+        && y >= -border_size && y <= border_size) {
         // Fill the character tile
         drawPlayer(
-          x + map.border_size, y + map.border_size,
-          game.all_users[u]
+          x + border_size, y + border_size,
+          game.all_users[u], tile_buffer
         )
       }
     }
@@ -361,6 +370,13 @@ function drawSettings(canvas_width, canvas_height) {
     "Show Coordinates: " + (settings.settings.coordinates ? "On" : "Off"),
     canvas_width / 4 - 24,
     95
+  );
+
+  // Show current coordinates
+  ctx.fillText(
+    "Zoom: " + (settings.settings.zoom ? "Close" : "Far"),
+    canvas_width / 4 - 24,
+    120
   );
 }
 
