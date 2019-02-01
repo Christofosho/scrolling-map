@@ -1,18 +1,7 @@
-## helpers.py
-
 import time
 
 from app.constants import codes, MOVEMENTS
 
-""" is_action_bad(action, owner)
-
-  In:
-    action: int (the action to be verified),
-    owner: dict (the sender of the action)
-
-  Out:
-    bool
-"""
 def is_action_bad(action, owner):
   bad_input = action not in codes
   action_time = int(time.time() * 1000) # Milliseconds
@@ -30,17 +19,6 @@ def is_action_bad(action, owner):
     return True
   return False
 
-""" handle_pickup(owner)
-
-  Determines whether a pickup action is successful, and updates
-  the map and user accordingly.
-
-  In:
-    owner: dict (the sender of the action)
-
-  Out:
-    bool
-"""
 def handle_pickup(owner): # TODO
   cx = curr_cx = owner.x
   cy = curr_cy = owner.y

@@ -1,23 +1,8 @@
-### movement.py
-# Handles movement actions.
-
 from app.definitions import MAPS, ENTITIES, PORTALS
 from app.constants import BLOCKING, BORDER_TILES, DEFAULT_X, DEFAULT_Y
 
 tile_options = [entity['blocking'] for entity in ENTITIES]
 
-""" move_self(user, direction)
-
-  Checks to see if the player is allowed to move.
-  If yes, the new coordinates are returned.
-
-  In:
-    user: dict (user data),
-    direction: int (direction of movement)
-
-  Out:
-    tuple(bool, int, int)
-"""
 def move_self(user, direction):
   cx = curr_cx = user.x
   cy = curr_cy = user.y

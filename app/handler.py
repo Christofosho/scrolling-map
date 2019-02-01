@@ -1,6 +1,3 @@
-### handler.py
-# Handles user input.
-
 import time
 
 from app import constants, database, helpers
@@ -11,21 +8,8 @@ from app.definitions import ENTITIES, MAPS
 
 class Handler:
 
-  # Not actually constants - TODO later.
   users = {}
 
-  """ handle_connect(socket, request)
-
-    Initializes new users in the users dictionary. Provides
-    an updates user list to all users.
-
-    In:
-      socket: obj (socket object),
-      request: obj (request object)
-
-    Out:
-      None
-  """
   def handle_connect(self, socket, request, username, authenticated):
     if not authenticated:
       return sender.user_authenticated(request, username, authenticated)
@@ -50,9 +34,6 @@ class Handler:
     sender.update_all_players(socket, self.users[username], self.users)
     sender.user_authenticated(request, username, True)
 
-  """ send_init_data(username)
-
-  """
   def send_init_data(self, request, username):
     user = self.users.get(username, None)
     if user:
@@ -82,17 +63,6 @@ class Handler:
       ]
       sender.send_initialize_player(request, data)
 
-  """ distribute(socket, request, data)
-
-    Handles user input, calling a function based on the input
-    and sending an update to the client(s) based on the result.
-
-    In:
-      socket: obj (socket object),
-      request: obj (request object),
-      data: dict (information being sent),
-
-  """
   def distribute(self, socket, request, data):
     action_occurred = False
     transition = False
@@ -105,7 +75,6 @@ class Handler:
 
     ## Pickup items
     if action == constants.SPACEBAR:
-      # sender.send_map_data(socket, handle_pickup(owner))
       action_occurred = True
 
     ## Use objects
@@ -139,29 +108,12 @@ class Handler:
       sender.update_all_players(socket, owner, self.users, transition)
       owner.last_action = int(time.time() * 1000) # Milliseconds
 
-  """ store_settings(data)
-
-    Stores settings for a player in their player object.
-
-    In:
-      data: obj (includes settings)
-  """
   def store_settings(self, data):
     owner = self.users.get(data.get('username'))
     settings = data.get('settings')
     owner.settings = settings
     database.save_user(owner)
 
-  """ handle_disconnect(socket, request)
-
-    Removes a user from the list and updates
-    all users with the new user list.
-
-    In:
-      socket: obj (socket object),
-      request: obj (request object)
-
-  """
   def handle_disconnect(self, socket, request):
     uname_to_sid = {u.current_sid: u
                     for u in self.users.values()

@@ -1,6 +1,3 @@
-### sender.py
-# Sends packets to the client.
-
 from flask_socketio import emit
 from app.definitions import MAPS
 
@@ -9,33 +6,12 @@ import json
 def user_authenticated(request, username, authenticated):
   emit('authenticated', json.dumps({'success': authenticated, 'username': username}), room=request.sid)
 
-""" send_initialize_player(request, data)
-
-  In:
-    request: obj (request object),
-    data: dict (initial player data)
-
-"""
 def send_initialize_player(request, data):
   emit('init_data', json.dumps(data), room=request.sid)
 
-""" send_object_action(socket, tiles)
-
-  In:
-    socket: obj (socket object),
-    tiles: dict (tile definition set)
-
-"""
 def send_object_action(socket, request, tiles):
   socket.emit('tiles', json.dumps(tiles), room=request.sid)
 
-""" update_all_players(socket, users)
-
-  In:
-    socket: obj (socket object),
-    users: dict (all user data)
-
-"""
 def update_all_players(socket, owner, users, transition=False):
   data = owner.getAllData()
 
@@ -70,14 +46,6 @@ def update_all_players(socket, owner, users, transition=False):
       socket.emit('remove_user',
         json.dumps({'username': owner.username}), room=user.current_sid)
 
-
-""" send_map_data(socket, map_data)
-
-  In:
-    socket: obj (socket object),
-    map_data: list (updated data about the map)
-
-"""
 def send_map_data(socket, users):
   for user in users.values():
     map = MAPS[user.map_id]

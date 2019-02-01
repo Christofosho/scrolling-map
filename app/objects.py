@@ -1,24 +1,9 @@
-### objects.py
-
 from app import sender
 from app import database
 from app.definitions import MAPS, ENTITIES
 from app.constants import OFFSET_LEFT, OFFSET_RIGHT, OFFSET_UP, OFFSET_DOWN
 from app.constants import HAIR_ACCESSORY, SHIRTS
 
-""" check_object(x, y, dir, map)
-
-    Returns the object id at the position player is facing.
-
-    In:
-        x: int (x coordinate of player),
-        y: int (y coordinate of player),
-        dir: int (direction player is facing),
-        map: str (map id player is on)
-    
-    Out:
-        int (object id)
-"""
 def check_object(x, y, dir, map):
     map = MAPS.get(map, None)
     obj_x = x

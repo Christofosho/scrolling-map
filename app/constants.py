@@ -1,6 +1,3 @@
-### constants.py
-# Any constant values can be placed here for easier access.
-
 ## Movement Constants
 SPACEBAR = 32
 E = 69
