@@ -4,6 +4,7 @@ from app.definitions import MAPS, ENTITIES
 from app.constants import OFFSET_LEFT, OFFSET_RIGHT, OFFSET_UP, OFFSET_DOWN
 from app.constants import HAIR_ACCESSORY, SHIRTS
 
+
 def check_object(x, y, dir, map):
     map = MAPS.get(map, None)
     obj_x = x
@@ -11,7 +12,7 @@ def check_object(x, y, dir, map):
 
     if dir == OFFSET_LEFT:
         obj_x -= 1
-    
+
     elif dir == OFFSET_RIGHT:
         obj_x += 1
 
@@ -37,6 +38,7 @@ def check_object(x, y, dir, map):
 
     return None, -1, -1
 
+
 def determine_interaction(socket, owner, obj, obj_x, obj_y):
 
     # Some objects have specific associated interaction.
@@ -44,8 +46,8 @@ def determine_interaction(socket, owner, obj, obj_x, obj_y):
     if not interaction:
         # Object has no interaction method.
         return
-        
-    ## Handle various interaction types.
+
+    # Handle various interaction types.
 
     # Doors, ...
     if interaction == "replace":
@@ -71,6 +73,7 @@ def determine_interaction(socket, owner, obj, obj_x, obj_y):
     elif interaction == "regenerate":
         pass
 
+
 def replace_object(socket, owner, obj, obj_x, obj_y):
     replace = obj.get("related_entity_id", None)
     if replace is None:
@@ -81,7 +84,7 @@ def replace_object(socket, owner, obj, obj_x, obj_y):
     if map is None:
         # Owner's map is invalid.
         return
-    
+
     # Object index is always 1
     MAPS[owner.map_id][obj_y][obj_x][1] = replace
     sender.send_map_data(socket, map)
