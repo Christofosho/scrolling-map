@@ -1,5 +1,4 @@
 class Player:
-
   def __init__(self, player_id, username, x, y, map_id,
     shirt, hair, skin, eyes, pants, shoes, hair_accessory,
     current_sid, settings, direction=0, last_action=0, bag=[]):

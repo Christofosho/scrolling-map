@@ -21,22 +21,6 @@ def move_self(user, direction):
     return True, cx, cy
   return False, curr_cx, curr_cy
 
-""" check_direction(direction, cx, cy, ex, ey)
-
-  Checks the potential direction against boundaries.
-  If there is no boundary being hit, modifies the return
-  coordinate value accordingly.
-
-  In:
-    direction: int (the direction we want to move),
-    cx: int (the current x coordinate),
-    cy: int (the current y coordinate),
-    ex: int (the end x boundary on the map),
-    ey: int (the end y boundary on the map)
-
-  Out:
-    int, int
-"""
 def check_direction(direction, cx, cy, ex, ey):
   # Left
   if direction in (37, 65):
@@ -60,17 +44,6 @@ def check_direction(direction, cx, cy, ex, ey):
 
   return cx, cy
 
-""" check_for_portal(owner)
-
-  Checks if a portal is on the given tile, and
-  sets an owner's new map and coordinates if true.
-
-  In:
-    owner: obj (user object)
-  
-  Out:
-    bool
-"""
 def check_for_portal(owner):
   map = MAPS.get(owner.map_id)
   tile = map[owner.y][owner.x]
