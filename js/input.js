@@ -10,11 +10,18 @@ import * as settings from './settings';
 export let last_click_x = -1;
 export let last_click_y = -1;
 
+let last_click_time = Date.now();
+
 function sendAction(e) {
   if (![
     32, 37, 38, 39, 40, 65, 68, 69, 83, 87
   ].includes(e.keyCode)) return;
   e.preventDefault();
+
+  if (last_click_time >= Date.now() - 300) {
+    return; // 300ms delay on clicks
+  }
+  last_click_time = Date.now()
 
   if (e.keyCode == 32) { // Spacebar
     console.log("Eventually we will implement the spacebar for interacting"
