@@ -16,6 +16,8 @@ a.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/test.db'
 a.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(a)
 
+a.secret_key = 'fake'
+
 from app import routes
 from app.models import User
 from app import entity

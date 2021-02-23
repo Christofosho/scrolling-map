@@ -81,6 +81,3 @@ def settings(data):
     settings = authenticator.validate_settings(data)
     if settings:
         handler.store_settings(data)
-
-
-a.secret_key = 'fake'

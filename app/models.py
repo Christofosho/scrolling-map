@@ -3,7 +3,6 @@ from app import db
 import json
 from sqlalchemy.ext.hybrid import hybrid_property
 
-
 class User(db.Model):
     uid = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True, nullable=False)
@@ -43,3 +42,5 @@ class User(db.Model):
     @settings.setter
     def settings(self, s):
         self._settings = json.dumps(s)
+
+db.create_all()
