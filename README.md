@@ -9,3 +9,6 @@
 1. `poetry install`
 2. `npm install`
 3. `npx webpack`
+
+### Run
+1. `poetry run flask run`
