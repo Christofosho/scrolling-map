@@ -21,7 +21,7 @@ def update_all_players(socket, owner, users, transition=False):
     data = owner.getAllData()
 
     if owner in users.values():
-        for user in users.values():
+        for user in [*users.values()]:
 
             # Same map means update.
             if user.map_id == owner.map_id:
