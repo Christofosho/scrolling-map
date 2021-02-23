@@ -8,7 +8,7 @@ socketio = SocketIO(a,
     "http://localhost:5000",
     "https://scrolling-map.herokuapp.com"
   ],
-  logger=True, engineio_logger=True
+  #logger=True, engineio_logger=True
 )
 
 from flask_sqlalchemy import SQLAlchemy
