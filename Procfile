@@ -1,1 +1,1 @@
-web: poetry run flask run
+web: poetry run flask run -h '0.0.0.0' -p $PORT

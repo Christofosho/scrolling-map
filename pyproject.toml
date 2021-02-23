@@ -5,9 +5,11 @@ description = ""
 authors = ["Chris <csnow@live.ca>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-Flask = "^1.1.2"
+python = "3.9.2"
+Flask = "1.1.2"
 Flask-SocketIO = "4.3.2"
+poetry = "^1.1.4"
+Flask-SQLAlchemy = "^2.4.4"
 
 [tool.poetry.dev-dependencies]
 
