@@ -14,8 +14,8 @@ let last_click_time = Date.now();
 
 function sendAction(e) {
   if (![
-    32, 37, 38, 39, 40, 65, 68, 69, 83, 87
-  ].includes(e.keyCode)) return;
+    "Space", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "KeyA", "KeyD", "KeyE", "KeyS", "KeyW"
+  ].includes(e.code)) return;
   e.preventDefault();
 
   if (last_click_time >= Date.now() - 300) {
@@ -23,14 +23,14 @@ function sendAction(e) {
   }
   last_click_time = Date.now()
 
-  if (e.keyCode == 32) { // Spacebar
+  if (e.code == "Space") { // Spacebar
     console.log("Eventually we will implement the spacebar for interacting"
       + " with items below your character.");
   }
 
   game.socket.emit('json', JSON.stringify({
     'username': player.username,
-    'action': e.keyCode,
+    'action': e.code,
   }))
 }
 
@@ -130,7 +130,7 @@ function clickUnderTile(click_x, click_y, mid_low, mid_high) {
     [mid_low, mid_high, mid_high, mid_low], // x values
     [mid_low, mid_low, mid_high, mid_high], // y values
     click_x, click_y)) {
-    sendAction({'keyCode': 32, 'preventDefault': function(){}}); // Spacebar
+    sendAction({'code': "Space", 'preventDefault': function(){}});
     return true;
   }
   return false;
@@ -143,10 +143,10 @@ function clickAdjacentTile(click_x, click_y, mid_low, mid_high) {
     [mid_low - map.tile_buffer, mid_low - map.tile_buffer, mid_low, mid_low], // y values
     click_x, click_y)) {
     if (player.direction == 1 && map.containsObject(player.cx, player.cy-1)) {
-      sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
+      sendAction({'code': "KeyE", 'preventDefault': function(){}});
     }
     else {
-      sendAction({'keyCode': 38, 'preventDefault': function(){}}); // Up
+      sendAction({'code': "ArrowUp", 'preventDefault': function(){}});
     }
     return true;
   }
@@ -157,10 +157,10 @@ function clickAdjacentTile(click_x, click_y, mid_low, mid_high) {
     [mid_high, mid_high + map.tile_buffer, mid_high + map.tile_buffer, mid_high], // y values
     click_x, click_y)) {
     if (player.direction == 0 && map.containsObject(player.cx, player.cy+1)) {
-      sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
+      sendAction({'code': "KeyE", 'preventDefault': function(){}});
     }
     else {
-      sendAction({'keyCode': 40, 'preventDefault': function(){}}); // Up
+      sendAction({'code': "ArrowDown", 'preventDefault': function(){}});
     }
     return true;
   }
@@ -171,10 +171,10 @@ function clickAdjacentTile(click_x, click_y, mid_low, mid_high) {
     [mid_low, mid_low, mid_high, mid_high], // y values
     click_x, click_y)) {
     if (player.direction == 3 && map.containsObject(player.cx-1, player.cy)) {
-      sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
+      sendAction({'code': "KeyE", 'preventDefault': function(){}});
     }
     else {
-      sendAction({'keyCode': 37, 'preventDefault': function(){}}); // Up
+      sendAction({'code': "ArrowLeft", 'preventDefault': function(){}});
     }
     return true;
   }
@@ -185,10 +185,10 @@ function clickAdjacentTile(click_x, click_y, mid_low, mid_high) {
     [mid_low, mid_low, mid_high, mid_high], // y values
     click_x, click_y)) {
     if (player.direction == 2 && map.containsObject(player.cx+1, player.cy)) {
-      sendAction({'keyCode': 69, 'preventDefault': function(){}}); // E
+      sendAction({'code': "KeyE", 'preventDefault': function(){}});
     }
     else {
-      sendAction({'keyCode': 39, 'preventDefault': function(){}}); // Up
+      sendAction({'code': "ArrowRight", 'preventDefault': function(){}});
     }
     return true;
   }
@@ -200,26 +200,26 @@ function clickFarTile(click_x, click_y, canvas_width, canvas_height, mid_width, 
   /* Movement */
   if (polygon_click_test(3,
     [0, mid_width, canvas_width], [0, mid_height, 0],
-    click_x, click_y)) { // Up
-    sendAction({'keyCode': 38, 'preventDefault': function(){}});
+    click_x, click_y)) {
+    sendAction({'code': "ArrowUp", 'preventDefault': function(){}});
     return true;
   }
   else if (polygon_click_test(3,
     [0, mid_width, canvas_width], [canvas_height, mid_height, canvas_height],
-    click_x, click_y)) { // Down
-    sendAction({'keyCode': 40, 'preventDefault': function(){}});
+    click_x, click_y)) {
+    sendAction({'code': "ArrowDown", 'preventDefault': function(){}});
     return true;
   }
   else if (polygon_click_test(3,
     [0, mid_width, 0], [0, mid_height, canvas_height],
-    click_x, click_y)) { // Left
-    sendAction({'keyCode': 37, 'preventDefault': function(){}});
+    click_x, click_y)) {
+    sendAction({'code': "ArrowLeft", 'preventDefault': function(){}});
     return true;
   }
   else if (polygon_click_test(3,
     [canvas_width, mid_width, canvas_width], [0, mid_height, canvas_height],
-    click_x, click_y)) { // Right
-    sendAction({'keyCode': 39, 'preventDefault': function(){}});
+    click_x, click_y)) {
+    sendAction({'code': "ArrowRight", 'preventDefault': function(){}});
     return true;
   }
   return false;

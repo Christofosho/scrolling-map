@@ -1,5 +1,5 @@
 from app.definitions import MAPS, ENTITIES, PORTALS
-from app.constants import BLOCKING, BORDER_TILES, DEFAULT_X, DEFAULT_Y
+from app import constants
 
 tile_options = [entity['blocking'] for entity in ENTITIES]
 
@@ -8,15 +8,15 @@ def move_self(user, direction):
     cx = curr_cx = user.x
     cy = curr_cy = user.y
     map_data = MAPS.get(user.map_id)
-    ex = len(map_data[0]) - BORDER_TILES
-    ey = len(map_data) - BORDER_TILES
+    ex = len(map_data[0]) - constants.BORDER_TILES
+    ey = len(map_data) - constants.BORDER_TILES
 
     cx, cy = check_direction(direction, cx, cy, ex, ey)
     tile = map_data[cy][cx]
     if (type(tile) == list):
-        blocked = any([ENTITIES[x]['blocking'] & BLOCKING for x in tile])
+        blocked = any([ENTITIES[x]['blocking'] & constants.BLOCKING for x in tile])
     else:
-        blocked = ENTITIES[tile]['blocking'] & BLOCKING
+        blocked = ENTITIES[tile]['blocking'] & constants.BLOCKING
 
     if not(blocked) and (cx != curr_cx or cy != curr_cy):
         return True, cx, cy
@@ -24,24 +24,20 @@ def move_self(user, direction):
 
 
 def check_direction(direction, cx, cy, ex, ey):
-    # Left
-    if direction in (37, 65):
-        if cx > BORDER_TILES:  # Boundary check
+    if direction in (constants.LEFT, constants.A):
+        if cx > constants.BORDER_TILES:  # Boundary check
             cx -= 1
 
-    # Right
-    elif direction in (39, 68):
+    elif direction in (constants.RIGHT, constants.D):
         if cx < ex:  # Boundary check
             cx += 1
 
-    # Down
-    elif direction in (40, 83):
+    elif direction in (constants.DOWN, constants.S):
         if cy < ey:  # Boundary check
             cy += 1
 
-    # Up
-    elif direction in (38, 87):
-        if cy > BORDER_TILES:  # Boundary check
+    elif direction in (constants.UP, constants.W):
+        if cy > constants.BORDER_TILES:  # Boundary check
             cy -= 1
 
     return cx, cy

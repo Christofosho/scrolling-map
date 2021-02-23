@@ -1,14 +1,14 @@
 # Movement Constants
-SPACEBAR = 32
-E = 69
-LEFT = 37
-UP = 38
-RIGHT = 39
-DOWN = 40
-A = 65  # Left
-W = 87  # Up
-D = 68  # Right
-S = 83  # Down
+SPACEBAR = "Space"
+E = "KeyE"
+LEFT = "ArrowLeft"
+UP = "ArrowUp"
+RIGHT = "ArrowRight"
+DOWN = "ArrowDown"
+A = "KeyA"  # Left
+W = "KeyW"  # Up
+D = "KeyD"  # Right
+S = "KeyS"  # Down
 codes = (
     SPACEBAR,
     E,
