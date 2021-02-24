@@ -1,9 +1,9 @@
 import time
 
-from app import constants, database, helpers
-from app import movement, objects, sender
-from app.entity.player import Player
-from app.definitions import ENTITIES, MAPS
+from game import constants, database, helpers
+from game import movement, objects, sender
+from game.entity.player import Player
+from game.definitions import ENTITIES, MAPS
 
 
 class Handler:

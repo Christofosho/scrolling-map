@@ -2,10 +2,10 @@ const path = require('path');
 
 module.exports = {
   devtool: 'eval-source-map',
-  entry: "./js/game.js",
+  entry: "./game/js/game.js",
   output: {
     filename: "bundle.js",
-    path: path.resolve(__dirname, "app", "static")
+    path: path.resolve(__dirname, "game", "static")
   },
   mode: "production",
   "module": {

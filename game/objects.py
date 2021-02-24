@@ -1,8 +1,8 @@
-from app import sender
-from app import database
-from app.definitions import MAPS, ENTITIES
-from app.constants import OFFSET_LEFT, OFFSET_RIGHT, OFFSET_UP, OFFSET_DOWN
-from app.constants import HAIR_ACCESSORY, SHIRTS
+from game import sender
+from game import database
+from game.definitions import MAPS, ENTITIES
+from game.constants import OFFSET_LEFT, OFFSET_RIGHT, OFFSET_UP, OFFSET_DOWN
+from game.constants import HAIR_ACCESSORY, SHIRTS
 
 
 def check_object(x, y, dir, map):

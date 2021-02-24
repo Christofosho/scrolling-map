@@ -1,6 +1,6 @@
 import time
 
-from app.constants import codes, MOVEMENTS
+from game.constants import codes, MOVEMENTS
 
 
 def is_action_bad(action, owner):

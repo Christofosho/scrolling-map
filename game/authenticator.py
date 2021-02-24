@@ -1,5 +1,5 @@
-from app import sender
-from app.constants import SETTINGS
+from game import sender
+from game.constants import SETTINGS
 
 
 def sanitize_username(data):

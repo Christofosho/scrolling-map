@@ -2,8 +2,8 @@ from flask import request, render_template
 
 import json
 
-from app import a, authenticator, socketio
-from app.handler import Handler
+from game import a, authenticator, socketio
+from game.handler import Handler
 
 handler = Handler()
 

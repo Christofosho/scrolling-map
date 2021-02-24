@@ -1,5 +1,5 @@
 from flask_socketio import emit
-from app.definitions import MAPS
+from game.definitions import MAPS
 
 import json
 

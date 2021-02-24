@@ -1,7 +1,7 @@
-from app import db
-from app.models import User
+from game import db
+from game.models import User
 
-from app.constants import DEFAULT_MAP, DEFAULT_X, DEFAULT_Y, SETTINGS
+from game.constants import DEFAULT_MAP, DEFAULT_X, DEFAULT_Y, SETTINGS
 
 
 def retrieve_user(username):

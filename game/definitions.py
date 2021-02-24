@@ -5,7 +5,7 @@ MAPS = {}
 ENTITIES = {}
 PORTALS = {}
 
-RESOURCES = Path('app', 'resources')
+RESOURCES = Path('game', 'resources')
 
 with open(RESOURCES / 'maps.json') as m:
     MAPS = json.load(m)

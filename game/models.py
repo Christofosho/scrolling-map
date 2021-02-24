@@ -1,4 +1,4 @@
-from app import db
+from game import db
 
 import json
 from sqlalchemy.ext.hybrid import hybrid_property

@@ -389,6 +389,17 @@ optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
+name = "python-dotenv"
+version = "0.15.0"
+description = "Add .env support to your django/flask apps in development and deployments"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
+[[package]]
 name = "python-engineio"
 version = "3.14.2"
 description = "Engine.IO server"
@@ -566,7 +577,7 @@ watchdog = ["watchdog"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.2"
-content-hash = "e7301b077abbe977c6cf4787a164794d4628f2ae02b4afe7b1a5dfc96fb742e2"
+content-hash = "27efa5a7af66e8f4c6b49cb1518dbd62629c0fd2b33fcb49286d33a84cf6fd15"
 
 [metadata.files]
 appdirs = [
@@ -825,6 +836,10 @@ pylev = [
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
     {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
+]
+python-dotenv = [
+    {file = "python-dotenv-0.15.0.tar.gz", hash = "sha256:587825ed60b1711daea4832cf37524dfd404325b7db5e25ebe88c495c9f807a0"},
+    {file = "python_dotenv-0.15.0-py2.py3-none-any.whl", hash = "sha256:0c8d1b80d1a1e91717ea7d526178e3882732420b03f08afea0406db6402e220e"},
 ]
 python-engineio = [
     {file = "python-engineio-3.14.2.tar.gz", hash = "sha256:eab4553f2804c1ce97054c8b22cf0d5a9ab23128075248b97e1a5b2f29553085"},

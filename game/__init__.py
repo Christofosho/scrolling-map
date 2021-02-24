@@ -18,6 +18,6 @@ db = SQLAlchemy(a)
 
 a.secret_key = 'fake'
 
-from app import routes
-from app.models import User
-from app import entity
+from game import routes
+from game.models import User
+from game import entity

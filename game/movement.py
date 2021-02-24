@@ -1,5 +1,5 @@
-from app.definitions import MAPS, ENTITIES, PORTALS
-from app import constants
+from game.definitions import MAPS, ENTITIES, PORTALS
+from game import constants
 
 tile_options = [entity['blocking'] for entity in ENTITIES]
 
